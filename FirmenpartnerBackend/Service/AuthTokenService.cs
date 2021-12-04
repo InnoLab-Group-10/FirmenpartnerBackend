@@ -15,10 +15,10 @@ namespace FirmenpartnerBackend.Service
     {
         private readonly ApiDbContext apiDbContext;
         private readonly UserManager<IdentityUser> userManager;
-        private readonly JwtConfig jwtConfig;
+        private readonly EMailConfig jwtConfig;
         private readonly TokenValidationParameters refreshTokenValidationParameters;
 
-        public AuthTokenService(ApiDbContext apiDbContext, UserManager<IdentityUser> userManager, JwtConfig jwtConfig, TokenValidationParameters refreshTokenValidationParameters)
+        public AuthTokenService(ApiDbContext apiDbContext, UserManager<IdentityUser> userManager, EMailConfig jwtConfig, TokenValidationParameters refreshTokenValidationParameters)
         {
             this.apiDbContext = apiDbContext;
             this.userManager = userManager;
@@ -69,7 +69,7 @@ namespace FirmenpartnerBackend.Service
             };
         }
 
-        public async Task<AuthResult> VerifyToken(TokenRequest tokenRequest)
+        public async Task<AuthResult> RefreshToken(TokenRequest tokenRequest)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
 

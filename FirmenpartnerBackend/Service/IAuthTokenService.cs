@@ -7,6 +7,6 @@ namespace FirmenpartnerBackend.Service
     public interface IAuthTokenService
     {
         Task<AuthResult> GenerateToken(IdentityUser user);
-        Task<AuthResult> VerifyToken(TokenRequest tokenRequest);
+        Task<AuthResult> RefreshToken(TokenRequest tokenRequest);
     }
 }

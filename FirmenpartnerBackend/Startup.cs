@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NETCore.MailKit.Extensions;
+using NETCore.MailKit.Infrastructure.Internal;
 using System.Text;
 
 namespace FirmenpartnerBackend
@@ -19,7 +21,6 @@ namespace FirmenpartnerBackend
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApiDbContext>(options =>
@@ -52,9 +53,8 @@ namespace FirmenpartnerBackend
             // Authentication
             #region Auth
 
-            // JwtConfig
             IConfiguration config = Configuration.GetSection("JwtConfig");
-            JwtConfig jwtConfig = config.Get<JwtConfig>();
+            EMailConfig jwtConfig = config.Get<EMailConfig>();
 
             byte[]? jwtSecret = Encoding.ASCII.GetBytes(Configuration["JwtConfig:Secret"]);
 
@@ -112,12 +112,31 @@ namespace FirmenpartnerBackend
                             .AddEntityFrameworkStores<ApiDbContext>();
             #endregion
 
+            // Mailing
+
+            IConfiguration mailConfigSection = Configuration.GetSection("EMailConfig");
+            MailConfig mailConfig = mailConfigSection.Get<MailConfig>();
+
+            services.AddMailKit(optionBuilder =>
+            {
+                optionBuilder.UseMailKit(new MailKitOptions()
+                {
+                    Server = mailConfig.Server,
+                    Port = mailConfig.Port,
+                    SenderName = mailConfig.SenderName,
+                    SenderEmail = mailConfig.SenderMail,
+                    Account = mailConfig.Username,
+                    Password = mailConfig.Password,
+                    Security = true
+                });
+            });
+
             // Custom services
 
             services.AddScoped<IAuthTokenService, AuthTokenService>();
+            services.AddScoped<IResetPasswordService, ResetPasswordService>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             //if (env.IsDevelopment())

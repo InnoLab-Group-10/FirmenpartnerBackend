@@ -15,15 +15,69 @@ namespace FirmenpartnerBackend.Controllers
     {
         private readonly UserManager<IdentityUser> userManager;
         private readonly IAuthTokenService authTokenService;
+        private readonly IResetPasswordService resetPasswordService;
 
-        public UserController(UserManager<IdentityUser> userManager, IAuthTokenService authTokenService)
+        public UserController(UserManager<IdentityUser> userManager, IAuthTokenService authTokenService, IResetPasswordService resetPasswordService)
         {
             this.userManager = userManager;
             this.authTokenService = authTokenService;
+            this.resetPasswordService = resetPasswordService;
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(typeof(AuthResponse), 200)]
+        [ProducesResponseType(typeof(AuthResponse), 400)]
+        public async Task<IActionResult> GetUser([FromRoute] string id)
+        {
+            if (ModelState.IsValid)
+            {
+                IdentityUser? user = await userManager.FindByIdAsync(id);
+
+                if (user == null)
+                {
+                    return BadRequest(new GetUserResponse()
+                    {
+                        Success = false,
+                        Errors = new List<string>() { "No user with the given ID exists." }
+                    });
+                }
+                else
+                {
+                    return Ok(new GetUserResponse()
+                    {
+                        Success = true,
+                        Errors = new List<string>(),
+                        Id = user.Id,
+                        Username = user.UserName,
+                        Email = user.Email
+                    });
+                }
+
+            }
+
+            return BadRequest(new GetUserResponse()
+            {
+                Success = false,
+                Errors = new List<string>() { "Invalid request." }
+            });
+        }
+
+        [HttpGet]
+        [Route("current")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(typeof(AuthResponse), 200)]
+        [ProducesResponseType(typeof(AuthResponse), 400)]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            string id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id").Value;
+            return await GetUser(id);
         }
 
         [HttpPost]
-        [Route("register")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(401)]
         [ProducesResponseType(typeof(AuthResponse), 200)]
@@ -74,91 +128,141 @@ namespace FirmenpartnerBackend.Controllers
         }
 
         [HttpPost]
-        [Route("login")]
-        [ProducesResponseType(typeof(AuthResponse), 200)]
-        [ProducesResponseType(typeof(AuthResponse), 400)]
-        public async Task<IActionResult> Login([FromBody] LoginUserRequest user)
+        [Route("change-password")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(typeof(ChangePasswordResponse), 200)]
+        [ProducesResponseType(typeof(ChangePasswordResponse), 400)]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
             if (ModelState.IsValid)
             {
-                IdentityUser? existingUser = await userManager.FindByEmailAsync(user.Email);
+                string userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id").Value;
+                IdentityUser? targetUser = await userManager.FindByIdAsync(userId);
 
-                if (existingUser == null)
+                if (targetUser == null)
                 {
-                    return BadRequest(new AuthResponse()
+                    return BadRequest(new ChangePasswordResponse()
                     {
                         Success = false,
-                        Errors = new List<string>(){
-                                        "Invalid authentication request."
-                                    }
+                        Errors = new List<string> {
+                            "Invalid request."
+                        }
                     });
                 }
 
-                bool isCorrect = await userManager.CheckPasswordAsync(existingUser, user.Password);
+                IdentityResult result = await userManager.ChangePasswordAsync(targetUser, request.OldPassword, request.NewPassword);
 
-                if (isCorrect)
+                if (result.Succeeded)
                 {
-                    AuthResult result = await authTokenService.GenerateToken(existingUser);
-
-                    return Ok(new AuthResponse()
+                    return Ok(new ChangePasswordResponse()
                     {
                         Success = true,
-                        Token = result.Token,
-                        RefreshToken = result.RefreshToken,
+                        Errors = new List<string>()
                     });
                 }
                 else
                 {
-                    // We dont want to give to much information on why the request has failed for security reasons
-                    return BadRequest(new AuthResponse()
+                    return BadRequest(new ChangePasswordResponse()
                     {
                         Success = false,
-                        Errors = new List<string>(){
-                                         "Invalid authentication request."
-                                    }
+                        Errors = result.Errors.Select(e => $"{e.Code}: {e.Description}").ToList()
                     });
                 }
             }
 
-            return BadRequest(new AuthResponse()
+            return BadRequest(new ChangePasswordResponse()
             {
                 Success = false,
-                Errors = new List<string>(){
-                                        "Invalid request."
-                                    }
+                Errors = new List<string> {
+                            "Invalid request."
+                        }
             });
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(AuthResponse), 200)]
-        [ProducesResponseType(typeof(AuthResponse), 400)]
-        [Route("refresh")]
-        public async Task<IActionResult> RefreshToken([FromBody] TokenRequest tokenRequest)
+        [Route("reset-password")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ChangePasswordResponse), 200)]
+        [ProducesResponseType(typeof(ChangePasswordResponse), 400)]
+        public async Task<IActionResult> RequestResetPassword([FromBody] ResetPasswordRequest request)
         {
             if (ModelState.IsValid)
             {
-                AuthResult? res = await authTokenService.VerifyToken(tokenRequest);
+                IdentityUser? targetUser = await userManager.FindByEmailAsync(request.Email);
 
-                if (res == null)
+                if (targetUser == null)
                 {
-                    return BadRequest(new AuthResponse()
+                    return BadRequest(new ChangePasswordResponse()
                     {
-                        Errors = new List<string>() {
-                    "Invalid token."
-                },
-                        Success = false
+                        Success = false,
+                        Errors = new List<string> {
+                            "Invalid request."
+                        }
                     });
                 }
 
-                return Ok(res);
+                ChangePasswordResponse result = await resetPasswordService.RequestPasswordReset(targetUser);
+
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
             }
 
-            return BadRequest(new AuthResponse()
+            return BadRequest(new ChangePasswordResponse()
             {
-                Errors = new List<string>() {
-                "Invalid request."
-            },
-                Success = false
+                Success = false,
+                Errors = new List<string> {
+                            "Invalid request."
+                        }
+            });
+        }
+
+        [HttpPost]
+        [Route("confirm-reset-password")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(ChangePasswordResponse), 200)]
+        [ProducesResponseType(typeof(ChangePasswordResponse), 400)]
+        public async Task<IActionResult> FinalizeResetPassword([FromBody] FinalizeResetPasswordRequest request)
+        {
+            if (ModelState.IsValid)
+            {
+                IdentityUser? targetUser = await userManager.FindByEmailAsync(request.Email);
+
+                if (targetUser == null)
+                {
+                    return BadRequest(new ChangePasswordResponse()
+                    {
+                        Success = false,
+                        Errors = new List<string> {
+                            "Invalid request."
+                        }
+                    });
+                }
+
+                ChangePasswordResponse result = await resetPasswordService.FinalizePasswordReset(targetUser, request.ResetToken, request.NewPassword);
+
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
+
+            return BadRequest(new ChangePasswordResponse()
+            {
+                Success = false,
+                Errors = new List<string> {
+                            "Invalid request."
+                        }
             });
         }
 
