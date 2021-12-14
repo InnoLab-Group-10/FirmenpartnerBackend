@@ -1,5 +1,6 @@
 ﻿using FirmenpartnerBackend.Configuration;
 using FirmenpartnerBackend.Data;
+using FirmenpartnerBackend.Models.Data;
 using FirmenpartnerBackend.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -108,7 +109,7 @@ namespace FirmenpartnerBackend
                 jwt.TokenValidationParameters = tokenValidationParameters;
             });
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                             .AddEntityFrameworkStores<ApiDbContext>();
             #endregion
 
@@ -137,7 +138,7 @@ namespace FirmenpartnerBackend
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public async void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             //if (env.IsDevelopment())
             //{
@@ -160,6 +161,59 @@ namespace FirmenpartnerBackend
             {
                 endpoints.MapControllers();
             });
+
+            // Default root user and roles
+            await CreateRoles(serviceProvider);
+            await CreateRootUser(serviceProvider, Configuration.GetSection("RootUserConfig").Get<RootUserConfig>());
+        }
+
+        private async Task CreateRoles(IServiceProvider serviceProvider)
+        {
+            RoleManager<IdentityRole>? roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            IdentityResult roleResult;
+
+            // Find user roles using reflection (not performant but whatever)
+            List<string> roles = new List<string>();
+            foreach (System.Reflection.FieldInfo? roleField in typeof(ApplicationRoles).GetFields())
+            {
+                if (roleField.IsLiteral && roleField.FieldType == typeof(string))
+                {
+                    roles.Add((string)roleField.GetRawConstantValue());
+                }
+            }
+
+            // Add the roles
+            foreach (string? roleName in roles)
+            {
+                var roleExist = await roleManager.RoleExistsAsync(roleName);
+                if (!roleExist)
+                {
+                    roleResult = await roleManager.CreateAsync(new IdentityRole(roleName));
+                }
+            }
+        }
+
+        private async Task CreateRootUser(IServiceProvider serviceProvider, RootUserConfig config)
+        {
+            UserManager<ApplicationUser>? userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+            ApplicationUser? rootUser = new ApplicationUser
+            {
+                UserName = config.Username,
+                Email = config.Email,
+            };
+
+            ApplicationUser? existingUser = await userManager.FindByEmailAsync(config.Email);
+
+            if (existingUser == null)
+            {
+                IdentityResult? createRootUser = await userManager.CreateAsync(rootUser, config.Password);
+                if (createRootUser.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(rootUser, ApplicationRoles.ADMIN);
+
+                }
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using FirmenpartnerBackend.Models.Response;
+﻿using FirmenpartnerBackend.Models.Data;
+using FirmenpartnerBackend.Models.Response;
 using Microsoft.AspNetCore.Identity;
 using NETCore.MailKit.Core;
 
@@ -6,16 +7,16 @@ namespace FirmenpartnerBackend.Service
 {
     public class ResetPasswordService : IResetPasswordService
     {
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly IEmailService emailService;
 
-        public ResetPasswordService(UserManager<IdentityUser> userManager, IEmailService emailService)
+        public ResetPasswordService(UserManager<ApplicationUser> userManager, IEmailService emailService)
         {
             this.userManager = userManager;
             this.emailService = emailService;
         }
 
-        public async Task<ChangePasswordResponse> RequestPasswordReset(IdentityUser user)
+        public async Task<ChangePasswordResponse> RequestPasswordReset(ApplicationUser user)
         {
             string token = await userManager.GeneratePasswordResetTokenAsync(user);
 
@@ -41,7 +42,7 @@ namespace FirmenpartnerBackend.Service
             };
         }
 
-        public async Task<ChangePasswordResponse> FinalizePasswordReset(IdentityUser user, string token, string newPassword)
+        public async Task<ChangePasswordResponse> FinalizePasswordReset(ApplicationUser user, string token, string newPassword)
         {
             IdentityResult result = await userManager.ResetPasswordAsync(user, token, newPassword);
 

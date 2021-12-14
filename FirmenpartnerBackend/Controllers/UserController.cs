@@ -13,11 +13,11 @@ namespace FirmenpartnerBackend.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly IAuthTokenService authTokenService;
         private readonly IResetPasswordService resetPasswordService;
 
-        public UserController(UserManager<IdentityUser> userManager, IAuthTokenService authTokenService, IResetPasswordService resetPasswordService)
+        public UserController(UserManager<ApplicationUser> userManager, IAuthTokenService authTokenService, IResetPasswordService resetPasswordService)
         {
             this.userManager = userManager;
             this.authTokenService = authTokenService;
@@ -86,7 +86,7 @@ namespace FirmenpartnerBackend.Controllers
         {
             if (ModelState.IsValid)
             {
-                IdentityUser? existingUser = await userManager.FindByEmailAsync(user.Email);
+                ApplicationUser? existingUser = await userManager.FindByEmailAsync(user.Email);
 
                 if (existingUser != null)
                 {
@@ -97,7 +97,7 @@ namespace FirmenpartnerBackend.Controllers
                     });
                 }
 
-                IdentityUser? newUser = new IdentityUser() { Email = user.Email, UserName = user.Name };
+                ApplicationUser? newUser = new ApplicationUser() { Email = user.Email, UserName = user.Name };
                 IdentityResult? isCreated = await userManager.CreateAsync(newUser, user.Password);
                 if (isCreated.Succeeded)
                 {
@@ -138,7 +138,7 @@ namespace FirmenpartnerBackend.Controllers
             if (ModelState.IsValid)
             {
                 string userId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id").Value;
-                IdentityUser? targetUser = await userManager.FindByIdAsync(userId);
+                ApplicationUser? targetUser = await userManager.FindByIdAsync(userId);
 
                 if (targetUser == null)
                 {
@@ -189,7 +189,7 @@ namespace FirmenpartnerBackend.Controllers
         {
             if (ModelState.IsValid)
             {
-                IdentityUser? targetUser = await userManager.FindByEmailAsync(request.Email);
+                ApplicationUser? targetUser = await userManager.FindByEmailAsync(request.Email);
 
                 if (targetUser == null)
                 {
@@ -232,7 +232,7 @@ namespace FirmenpartnerBackend.Controllers
         {
             if (ModelState.IsValid)
             {
-                IdentityUser? targetUser = await userManager.FindByEmailAsync(request.Email);
+                ApplicationUser? targetUser = await userManager.FindByEmailAsync(request.Email);
 
                 if (targetUser == null)
                 {

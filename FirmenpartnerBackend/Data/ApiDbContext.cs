@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FirmenpartnerBackend.Data
 {
-    public class ApiDbContext : IdentityDbContext
+    public class ApiDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 

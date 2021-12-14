@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FirmenpartnerBackend.Models.Data
 {
@@ -13,6 +12,6 @@ namespace FirmenpartnerBackend.Models.Data
         public DateTime AddedDate { get; set; }
         public DateTime ExpiryDate { get; set; }
         [ForeignKey(nameof(UserId))]
-        public IdentityUser User { get; set; }
+        public ApplicationUser User { get; set; }
     }
 }

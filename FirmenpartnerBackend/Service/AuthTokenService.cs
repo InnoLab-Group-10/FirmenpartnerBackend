@@ -14,11 +14,11 @@ namespace FirmenpartnerBackend.Service
     public class AuthTokenService : IAuthTokenService
     {
         private readonly ApiDbContext apiDbContext;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly EMailConfig jwtConfig;
         private readonly TokenValidationParameters refreshTokenValidationParameters;
 
-        public AuthTokenService(ApiDbContext apiDbContext, UserManager<IdentityUser> userManager, EMailConfig jwtConfig, TokenValidationParameters refreshTokenValidationParameters)
+        public AuthTokenService(ApiDbContext apiDbContext, UserManager<ApplicationUser> userManager, EMailConfig jwtConfig, TokenValidationParameters refreshTokenValidationParameters)
         {
             this.apiDbContext = apiDbContext;
             this.userManager = userManager;
