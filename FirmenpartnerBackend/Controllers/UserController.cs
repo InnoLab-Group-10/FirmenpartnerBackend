@@ -1,4 +1,5 @@
-﻿using FirmenpartnerBackend.Models.Data;
+﻿using FirmenpartnerBackend.Configuration;
+using FirmenpartnerBackend.Models.Data;
 using FirmenpartnerBackend.Models.Request;
 using FirmenpartnerBackend.Models.Response;
 using FirmenpartnerBackend.Service;
@@ -25,8 +26,22 @@ namespace FirmenpartnerBackend.Controllers
         }
 
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = ApplicationRoles.ADMIN)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(typeof(GetAllUsersResponse), 200)]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            List<string> users = userManager.Users.Select(u => u.Id).ToList();
+            return Ok(new GetAllUsersResponse()
+            {
+                Success = true,
+                Users = users
+            });
+        }
+
+        [HttpGet]
         [Route("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = ApplicationRoles.ADMIN)]
         [ProducesResponseType(401)]
         [ProducesResponseType(typeof(AuthResponse), 200)]
         [ProducesResponseType(typeof(AuthResponse), 400)]
@@ -34,7 +49,7 @@ namespace FirmenpartnerBackend.Controllers
         {
             if (ModelState.IsValid)
             {
-                IdentityUser? user = await userManager.FindByIdAsync(id);
+                ApplicationUser? user = await userManager.FindByIdAsync(id);
 
                 if (user == null)
                 {
@@ -46,13 +61,15 @@ namespace FirmenpartnerBackend.Controllers
                 }
                 else
                 {
+                    List<string> roles = (await userManager.GetRolesAsync(user)).ToList();
+
                     return Ok(new GetUserResponse()
                     {
                         Success = true,
-                        Errors = new List<string>(),
                         Id = user.Id,
                         Username = user.UserName,
-                        Email = user.Email
+                        Email = user.Email,
+                        Roles = roles
                     });
                 }
 
@@ -70,7 +87,6 @@ namespace FirmenpartnerBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(401)]
         [ProducesResponseType(typeof(AuthResponse), 200)]
-        [ProducesResponseType(typeof(AuthResponse), 400)]
         public async Task<IActionResult> GetCurrentUser()
         {
             string id = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id").Value;
@@ -78,7 +94,7 @@ namespace FirmenpartnerBackend.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = ApplicationRoles.ADMIN)]
         [ProducesResponseType(401)]
         [ProducesResponseType(typeof(AuthResponse), 200)]
         [ProducesResponseType(typeof(AuthResponse), 400)]
@@ -99,22 +115,44 @@ namespace FirmenpartnerBackend.Controllers
 
                 ApplicationUser? newUser = new ApplicationUser() { Email = user.Email, UserName = user.Name };
                 IdentityResult? isCreated = await userManager.CreateAsync(newUser, user.Password);
+                List<string> errors = new List<string>();
+
                 if (isCreated.Succeeded)
                 {
-                    AuthResult result = await authTokenService.GenerateToken(newUser);
+                    IdentityResult addedToRole = await userManager.AddToRoleAsync(newUser, ApplicationRoles.USER);
 
-                    return Ok(new AuthResponse()
+                    if (addedToRole.Succeeded)
                     {
-                        Success = true,
-                        Token = result.Token,
-                        RefreshToken = result.RefreshToken
-                    });
+                        AuthResult result = await authTokenService.GenerateToken(newUser);
+
+                        if (result.Success)
+                        {
+                            return Ok(new AuthResponse()
+                            {
+                                Success = true,
+                                Token = result.Token,
+                                RefreshToken = result.RefreshToken
+                            });
+                        }
+                        else
+                        {
+                            errors.AddRange(result.Errors);
+                        }
+                    }
+                    else
+                    {
+                        errors.AddRange(addedToRole.Errors.Select(x => x.Description).ToList());
+                    }
+                }
+                else
+                {
+                    errors.AddRange(isCreated.Errors.Select(x => x.Description).ToList());
                 }
 
                 return new JsonResult(new AuthResponse()
                 {
                     Success = false,
-                    Errors = isCreated.Errors.Select(x => x.Description).ToList()
+                    Errors = errors
                 }
                 )
                 { StatusCode = 500 };
@@ -158,7 +196,6 @@ namespace FirmenpartnerBackend.Controllers
                     return Ok(new ChangePasswordResponse()
                     {
                         Success = true,
-                        Errors = new List<string>()
                     });
                 }
                 else

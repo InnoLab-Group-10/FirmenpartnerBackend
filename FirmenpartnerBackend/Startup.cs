@@ -109,7 +109,8 @@ namespace FirmenpartnerBackend
                 jwt.TokenValidationParameters = tokenValidationParameters;
             });
 
-            services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                            .AddRoles<IdentityRole>()
                             .AddEntityFrameworkStores<ApiDbContext>();
             #endregion
 
@@ -210,8 +211,8 @@ namespace FirmenpartnerBackend
                 IdentityResult? createRootUser = await userManager.CreateAsync(rootUser, config.Password);
                 if (createRootUser.Succeeded)
                 {
+                    await userManager.AddToRoleAsync(rootUser, ApplicationRoles.USER);
                     await userManager.AddToRoleAsync(rootUser, ApplicationRoles.ADMIN);
-
                 }
             }
         }

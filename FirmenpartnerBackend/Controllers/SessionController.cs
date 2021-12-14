@@ -12,10 +12,10 @@ namespace FirmenpartnerBackend.Controllers
     [ApiController]
     public class SessionController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly IAuthTokenService authTokenService;
 
-        public SessionController(UserManager<IdentityUser> userManager, IAuthTokenService authTokenService)
+        public SessionController(UserManager<ApplicationUser> userManager, IAuthTokenService authTokenService)
         {
             this.userManager = userManager;
             this.authTokenService = authTokenService;
@@ -30,7 +30,7 @@ namespace FirmenpartnerBackend.Controllers
         {
             if (ModelState.IsValid)
             {
-                IdentityUser? existingUser = await userManager.FindByEmailAsync(user.Email);
+                ApplicationUser? existingUser = await userManager.FindByEmailAsync(user.Email);
 
                 if (existingUser == null)
                 {
@@ -79,7 +79,7 @@ namespace FirmenpartnerBackend.Controllers
         }
 
         [HttpPost]
-        [Route("logout")]
+        [Route("invalidate")]
         [ProducesResponseType(typeof(LogoutUserResponse), 200)]
         [ProducesResponseType(typeof(LogoutUserResponse), 400)]
         public async Task<IActionResult> Logout([FromBody] LogoutUserRequest request)
@@ -126,13 +126,11 @@ namespace FirmenpartnerBackend.Controllers
             {
                 AuthResult? res = await authTokenService.RefreshToken(tokenRequest);
 
-                if (res == null)
+                if (res == null || !res.Success)
                 {
                     return BadRequest(new AuthResponse()
                     {
-                        Errors = new List<string>() {
-                    "Invalid token."
-                },
+                        Errors = res == null ? new List<string>() { "Invalid token." } : res.Errors,
                         Success = false
                     });
                 }
