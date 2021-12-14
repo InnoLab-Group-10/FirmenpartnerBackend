@@ -7,6 +7,7 @@ namespace FirmenpartnerBackend.Service
     public interface IAuthTokenService
     {
         Task<AuthResult> GenerateToken(IdentityUser user);
+        Task<bool> RemoveRefreshToken(string token);
         Task<AuthResult> RefreshToken(TokenRequest tokenRequest);
     }
 }

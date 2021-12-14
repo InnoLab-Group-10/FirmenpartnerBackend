@@ -79,6 +79,43 @@ namespace FirmenpartnerBackend.Controllers
         }
 
         [HttpPost]
+        [Route("logout")]
+        [ProducesResponseType(typeof(LogoutUserResponse), 200)]
+        [ProducesResponseType(typeof(LogoutUserResponse), 400)]
+        public async Task<IActionResult> Logout([FromBody] LogoutUserRequest request)
+        {
+            if (ModelState.IsValid)
+            {
+                bool success = await authTokenService.RemoveRefreshToken(request.RefreshToken);
+
+                if (!success)
+                {
+                    return BadRequest(new LogoutUserResponse()
+                    {
+                        Errors = new List<string>() {
+                            "Invalid refresh token."
+                        },
+                        Success = false
+                    });
+                }
+
+                return Ok(new LogoutUserResponse()
+                {
+                    Errors = new List<string>(),
+                    Success = true
+                });
+            }
+
+            return BadRequest(new LogoutUserResponse()
+            {
+                Errors = new List<string>() {
+                "Invalid request."
+            },
+                Success = false
+            });
+        }
+
+        [HttpPost]
         [Route("refresh")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(AuthResponse), 200)]

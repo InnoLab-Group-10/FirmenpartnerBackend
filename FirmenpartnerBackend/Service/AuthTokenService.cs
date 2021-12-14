@@ -69,6 +69,20 @@ namespace FirmenpartnerBackend.Service
             };
         }
 
+        public async Task<bool> RemoveRefreshToken(string refreshToken)
+        {
+            RefreshToken? storedToken = await apiDbContext.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshToken);
+            if (storedToken == null)
+            {
+                return false;
+            }
+
+            apiDbContext.RefreshTokens.Remove(storedToken);
+            await apiDbContext.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<AuthResult> RefreshToken(TokenRequest tokenRequest)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
