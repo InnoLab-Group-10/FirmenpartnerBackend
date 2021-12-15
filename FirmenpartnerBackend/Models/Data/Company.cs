@@ -1,11 +1,17 @@
-﻿namespace FirmenpartnerBackend.Models.Data
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FirmenpartnerBackend.Models.Data
 {
     public class Company
     {
-        public int Id { get; set; }
+        [Required]
+        public Guid Id { get; set; }
+
+        [Required]
+        [MaxLength(128)]
         public string Name { get; set; }
-        public int LocationId { get; set; }
-        public Location Location { get; set; }
+
+        [Required]
         public bool ContractSigned { get; set; }
     }
 }
