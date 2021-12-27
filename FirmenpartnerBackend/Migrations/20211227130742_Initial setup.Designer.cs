@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FirmenpartnerBackend.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20211215111000_Database setup")]
-    partial class Databasesetup
+    [Migration("20211227130742_Initial setup")]
+    partial class Initialsetup
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

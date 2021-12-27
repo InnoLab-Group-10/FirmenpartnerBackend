@@ -1,5 +1,6 @@
 ﻿using FirmenpartnerBackend.Configuration;
 using FirmenpartnerBackend.Data;
+using FirmenpartnerBackend.Mapping;
 using FirmenpartnerBackend.Models.Data;
 using FirmenpartnerBackend.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -50,6 +51,8 @@ namespace FirmenpartnerBackend
             {
                 options.AddPolicy("Open", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             });
+
+            services.AddAutoMapper(cfg => cfg.AddProfile<ModelToResponseProfile>());
 
             // Authentication
             #region Auth

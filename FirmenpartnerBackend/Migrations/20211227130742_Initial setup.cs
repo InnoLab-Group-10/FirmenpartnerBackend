@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FirmenpartnerBackend.Migrations
 {
-    public partial class Databasesetup : Migration
+    public partial class Initialsetup : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

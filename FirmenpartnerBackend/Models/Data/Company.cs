@@ -2,10 +2,8 @@
 
 namespace FirmenpartnerBackend.Models.Data
 {
-    public class Company
+    public class Company : BaseModel
     {
-        [Required]
-        public Guid Id { get; set; }
 
         [Required]
         [MaxLength(128)]
