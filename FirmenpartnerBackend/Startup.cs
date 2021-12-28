@@ -52,7 +52,11 @@ namespace FirmenpartnerBackend
                 options.AddPolicy("Open", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             });
 
-            services.AddAutoMapper(cfg => cfg.AddProfile<ModelToResponseProfile>());
+            services.AddAutoMapper(cfg =>
+            {
+                cfg.AddProfile<ModelToResponseProfile>();
+                cfg.AddProfile<RequestToModelProfile>();
+            });
 
             // Authentication
             #region Auth

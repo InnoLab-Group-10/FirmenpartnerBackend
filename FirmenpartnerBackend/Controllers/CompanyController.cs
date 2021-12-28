@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FirmenpartnerBackend.Data;
 using FirmenpartnerBackend.Models.Data;
+using FirmenpartnerBackend.Models.Request;
 using FirmenpartnerBackend.Models.Response;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +14,7 @@ namespace FirmenpartnerBackend.Controllers
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ProducesResponseType(401)]
-    public class CompanyController : GenericController<Company, CompanyBaseResponse, CompanySingleResponse, CompanyMultiResponse, CompanySingleResponse>
+    public class CompanyController : GenericController<Company, CompanyBaseResponse, CompanySingleResponse, CompanyMultiResponse, CompanyRequest>
     {
         public CompanyController(ApiDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {

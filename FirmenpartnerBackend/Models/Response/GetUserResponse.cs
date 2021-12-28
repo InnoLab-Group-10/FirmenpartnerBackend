@@ -1,6 +1,6 @@
 ﻿namespace FirmenpartnerBackend.Models.Response
 {
-    public class GetUserResponse : IBaseResponse
+    public class GetUserResponse : IResponse
     {
         public string Id { get; set; }
         public string Username { get; set; }

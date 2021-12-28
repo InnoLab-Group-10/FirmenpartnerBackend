@@ -1,6 +1,6 @@
 ﻿namespace FirmenpartnerBackend.Models.Response
 {
-    public class GetAllRolesResponse : IBaseResponse
+    public class GetAllRolesResponse : IResponse
     {
         public List<string> Roles { get; set; }
         public bool Success { get; set; }

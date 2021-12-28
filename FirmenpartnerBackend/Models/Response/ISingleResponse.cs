@@ -1,6 +1,6 @@
 ﻿namespace FirmenpartnerBackend.Models.Response
 {
-    public class BaseSingleResponse
+    public interface ISingleResponse
     {
         public Guid Id { get; set; }
     }

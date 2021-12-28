@@ -1,6 +1,6 @@
 ﻿namespace FirmenpartnerBackend.Models.Response
 {
-    public class BaseMultiResponse<T> where T : BaseSingleResponse
+    public interface IMultiResponse<T> where T : ISingleResponse
     {
         public List<T> Results { get; set; }
     }

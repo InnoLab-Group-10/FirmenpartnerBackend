@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using FirmenpartnerBackend.Configuration;
 using FirmenpartnerBackend.Data;
 using FirmenpartnerBackend.Models.Data;
 using FirmenpartnerBackend.Models.Response;
@@ -10,11 +9,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FirmenpartnerBackend.Controllers
 {
-    public abstract class GenericController<TModel, TBaseResponse, TSingleResponse, TMultiResponse, TCreateRequest> : ControllerBase where TModel : BaseModel, new()
-                                                                                                                        where TBaseResponse : BaseSingleResponse, new()
-                                                                                                                        where TSingleResponse : BaseSingleResponse, IBaseResponse, new()
-                                                                                                                        where TMultiResponse : BaseMultiResponse<TBaseResponse>, IBaseResponse, new()
-
+    public abstract class GenericController<TModel, TBaseResponse, TSingleResponse, TMultiResponse, TRequest> : ControllerBase where TModel : BaseModel
+                                                                                                                        where TBaseResponse : ISingleResponse, new()
+                                                                                                                        where TSingleResponse : ISingleResponse, IResponse, new()
+                                                                                                                        where TMultiResponse : IMultiResponse<TBaseResponse>, IResponse, new()
     {
         protected ApiDbContext dbContext;
         protected IMapper mapper;
@@ -80,35 +78,115 @@ namespace FirmenpartnerBackend.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = ApplicationRoles.ADMIN)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(200)]
-        public virtual async Task<IActionResult> Post([FromBody] TCreateRequest user)
+        public virtual async Task<IActionResult> Post([FromBody] TRequest request)
         {
-            return Ok();
+            if (ModelState.IsValid)
+            {
+                TModel model = mapper.Map<TModel>(request);
+                model.Id = Guid.NewGuid();
+
+                await GetDbSet().AddAsync(model);
+                await dbContext.SaveChangesAsync();
+
+                TSingleResponse response = mapper.Map<TSingleResponse>(model);
+                response.Success = true;
+
+                return Ok(response);
+            }
+
+            return BadRequest(new TSingleResponse()
+            {
+                Success = false,
+                Errors = new List<string>() { "Invalid request." }
+            });
         }
 
         [HttpDelete]
         [Route("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = ApplicationRoles.ADMIN)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
         [ProducesResponseType(200)]
         public virtual async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            return Ok();
+            if (ModelState.IsValid)
+            {
+                TModel? model = await GetDbSet().FindAsync(id);
+
+                if (model == null)
+                {
+                    return NotFound(new DeleteResponse()
+                    {
+                        Success = false,
+                        Errors = new List<string>() { "No entity with the given ID exists." }
+                    });
+                }
+                else
+                {
+                    GetDbSet().Remove(model);
+                    await dbContext.SaveChangesAsync();
+
+                    return Ok(new DeleteResponse()
+                    {
+                        Success = true
+                    });
+                }
+
+            }
+
+            return BadRequest(new DeleteResponse()
+            {
+                Success = false,
+                Errors = new List<string>() { "Invalid request." }
+            });
         }
 
         [HttpPut]
         [Route("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = ApplicationRoles.ADMIN)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(200)]
-        public virtual async Task<IActionResult> Put([FromRoute] Guid id)
+        public virtual async Task<IActionResult> Put([FromBody] TRequest request, [FromRoute] Guid id)
         {
-            return Ok();
+            if (ModelState.IsValid)
+            {
+                TModel? trackedModel = await GetDbSet().FindAsync(id);
+
+                if (trackedModel == null)
+                {
+                    return NotFound(new TSingleResponse()
+                    {
+                        Success = false,
+                        Errors = new List<string>() { "No entity with the given ID exists." }
+                    });
+                }
+                else
+                {
+                    TModel modifiedModel = mapper.Map<TModel>(request);
+                    modifiedModel.Id = id;
+
+                    dbContext.Entry(trackedModel).CurrentValues.SetValues(modifiedModel);
+                    await dbContext.SaveChangesAsync();
+
+                    TSingleResponse response = mapper.Map<TSingleResponse>(modifiedModel);
+                    response.Success = true;
+
+                    return Ok(response);
+                }
+
+            }
+
+            return BadRequest(new TSingleResponse()
+            {
+                Success = false,
+                Errors = new List<string>() { "Invalid request." }
+            });
         }
     }
 }
