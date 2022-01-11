@@ -196,23 +196,30 @@ namespace FirmenpartnerBackend.Controllers
                 else
                 {
                     if (request.Username != null) await userManager.SetUserNameAsync(trackedModel, request.Username);
+                    if (request.Username == "") await userManager.SetUserNameAsync(trackedModel, null);
 
                     if (request.Prefix != null) trackedModel.Prefix = request.Prefix;
+                    if (request.Prefix == "") trackedModel.Prefix = null;
+
                     if (request.FirstName != null) trackedModel.FirstName = request.FirstName;
+                    if (request.FirstName == "") trackedModel.FirstName = null;
+
                     if (request.LastName != null) trackedModel.LastName = request.LastName;
+                    if (request.LastName == "") trackedModel.LastName = null;
+
                     if (request.Suffix != null) trackedModel.Suffix = request.Suffix;
+                    if (request.Suffix == "") trackedModel.Suffix = null;
+
                     if (request.Notes != null) trackedModel.Notes = request.Notes;
+                    if (request.Notes == "") trackedModel.Notes = null;
+
+                    if (request.Phone != null) trackedModel.PhoneNumber = request.Phone;
+                    if (request.Phone == "") trackedModel.PhoneNumber = null;
 
                     if (request.Email != null)
                     {
                         string mailChangeToken = await userManager.GenerateChangeEmailTokenAsync(trackedModel, request.Email);
                         await userManager.ChangeEmailAsync(trackedModel, request.Email, mailChangeToken);
-                    }
-
-                    if (request.Phone != null)
-                    {
-                        string phoneChangeToken = await userManager.GenerateChangeEmailTokenAsync(trackedModel, request.Phone);
-                        await userManager.ChangePhoneNumberAsync(trackedModel, request.Phone, phoneChangeToken);
                     }
 
                     await userManager.UpdateAsync(trackedModel);
