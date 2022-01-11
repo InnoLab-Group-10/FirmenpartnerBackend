@@ -9,15 +9,12 @@ namespace FirmenpartnerBackend.Models.Data
         public Guid Id { get; set; }
 
         [Required]
-        [MaxLength(256)]
         public string Address { get; set; }
 
         [Required]
-        [MaxLength(64)]
         public string City { get; set; }
 
         [Required]
-        [MaxLength(12)]
         public string Zipcode { get; set; }
 
         [Required]

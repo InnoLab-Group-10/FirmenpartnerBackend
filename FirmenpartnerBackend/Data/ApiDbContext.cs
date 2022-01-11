@@ -10,7 +10,6 @@ namespace FirmenpartnerBackend.Data
         public DbSet<Company> Companies { get; set; }
         public DbSet<CompanyLocation> CompanyLocations { get; set; }
         public DbSet<Person> People { get; set; }
-        public DbSet<Contact> Contacts { get; set; }
         public DbSet<CompanyAssignment> CompanyAssignments { get; set; }
 
 

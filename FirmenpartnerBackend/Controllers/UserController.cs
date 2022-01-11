@@ -1,4 +1,5 @@
-﻿using FirmenpartnerBackend.Configuration;
+﻿using AutoMapper;
+using FirmenpartnerBackend.Configuration;
 using FirmenpartnerBackend.Models.Data;
 using FirmenpartnerBackend.Models.Request;
 using FirmenpartnerBackend.Models.Response;
@@ -17,12 +18,14 @@ namespace FirmenpartnerBackend.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IAuthTokenService authTokenService;
         private readonly IResetPasswordService resetPasswordService;
+        private readonly IMapper mapper;
 
-        public UserController(UserManager<ApplicationUser> userManager, IAuthTokenService authTokenService, IResetPasswordService resetPasswordService)
+        public UserController(UserManager<ApplicationUser> userManager, IAuthTokenService authTokenService, IResetPasswordService resetPasswordService, IMapper mapper)
         {
             this.userManager = userManager;
             this.authTokenService = authTokenService;
             this.resetPasswordService = resetPasswordService;
+            this.mapper = mapper;
         }
 
         [HttpGet]
@@ -68,7 +71,12 @@ namespace FirmenpartnerBackend.Controllers
                         Success = true,
                         Id = user.Id,
                         Username = user.UserName,
+                        Prefix = user.Prefix,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Suffix = user.Suffix,
                         Email = user.Email,
+                        Phone = user.PhoneNumber,
                         Roles = roles
                     });
                 }
@@ -163,6 +171,77 @@ namespace FirmenpartnerBackend.Controllers
                 Success = false,
                 Errors = new List<string>() { "Invalid request." }
             });
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = ApplicationRoles.ADMIN)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200)]
+        public virtual async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest request, [FromRoute] Guid id)
+        {
+            if (ModelState.IsValid)
+            {
+                ApplicationUser? trackedModel = await userManager.FindByIdAsync(id.ToString());
+
+                if (trackedModel == null)
+                {
+                    return NotFound(new GetUserResponse()
+                    {
+                        Success = false,
+                        Errors = new List<string>() { "No entity with the given ID exists." }
+                    });
+                }
+                else
+                {
+                    if (request.Username != null) await userManager.SetUserNameAsync(trackedModel, request.Username);
+
+                    if (request.Prefix != null) trackedModel.Prefix = request.Prefix;
+                    if (request.FirstName != null) trackedModel.FirstName = request.FirstName;
+                    if (request.LastName != null) trackedModel.LastName = request.LastName;
+                    if (request.Suffix != null) trackedModel.Suffix = request.Suffix;
+                    if (request.Notes != null) trackedModel.Notes = request.Notes;
+
+                    if (request.Email != null)
+                    {
+                        string mailChangeToken = await userManager.GenerateChangeEmailTokenAsync(trackedModel, request.Email);
+                        await userManager.ChangeEmailAsync(trackedModel, request.Email, mailChangeToken);
+                    }
+
+                    if (request.Phone != null)
+                    {
+                        string phoneChangeToken = await userManager.GenerateChangeEmailTokenAsync(trackedModel, request.Phone);
+                        await userManager.ChangePhoneNumberAsync(trackedModel, request.Phone, phoneChangeToken);
+                    }
+
+                    await userManager.UpdateAsync(trackedModel);
+
+                    List<string> roles = (await userManager.GetRolesAsync(trackedModel)).ToList();
+
+                    return Ok(new GetUserResponse()
+                    {
+                        Success = true,
+                        Id = trackedModel.Id,
+                        Username = trackedModel.UserName,
+                        Prefix = trackedModel.Prefix,
+                        FirstName = trackedModel.FirstName,
+                        LastName = trackedModel.LastName,
+                        Suffix = trackedModel.Suffix,
+                        Email = trackedModel.Email,
+                        Phone = trackedModel.PhoneNumber,
+                        Roles = roles
+                    });
+                }
+            }
+            else
+            {
+                return BadRequest(new GetUserResponse()
+                {
+                    Success = false,
+                    Errors = new List<string>() { "Invalid request." }
+                });
+            }
         }
 
         [HttpPost]

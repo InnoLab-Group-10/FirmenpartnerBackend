@@ -389,3 +389,7 @@ FodyWeavers.xsd
 FirmenpartnerBackend/debug.db
 
 FirmenpartnerBackend/appsettings.json
+
+FirmenpartnerBackend/debug.db-shm
+
+FirmenpartnerBackend/debug.db-wal
