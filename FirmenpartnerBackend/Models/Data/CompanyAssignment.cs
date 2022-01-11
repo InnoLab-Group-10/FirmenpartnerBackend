@@ -3,11 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FirmenpartnerBackend.Models.Data
 {
-    public class CompanyAssignment
+    public class CompanyAssignment : BaseModel
     {
-        [Required]
-        public Guid Id { get; set; }
-
         [Required]
         public Guid CompanyId { get; set; }
 

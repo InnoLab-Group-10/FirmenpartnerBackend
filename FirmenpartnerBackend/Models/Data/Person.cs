@@ -2,11 +2,8 @@
 
 namespace FirmenpartnerBackend.Models.Data
 {
-    public class Person
+    public class Person : BaseModel
     {
-        [Required]
-        public Guid Id { get; set; }
-
         [Required]
         public string FirstName { get; set; }
 
