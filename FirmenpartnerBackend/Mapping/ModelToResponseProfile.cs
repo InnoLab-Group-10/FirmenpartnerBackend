@@ -19,6 +19,8 @@ namespace FirmenpartnerBackend.Mapping
 
             CreateMap<Person, PersonBaseResponse>();
             CreateMap<Person, PersonSingleResponse>();
+
+            CreateMap<PersonBaseResponse, ContactBaseResponse>();
         }
     }
 }
