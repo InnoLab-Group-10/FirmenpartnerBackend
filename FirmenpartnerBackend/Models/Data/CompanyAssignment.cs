@@ -19,11 +19,10 @@ namespace FirmenpartnerBackend.Models.Data
         [ForeignKey(nameof(PersonId))]
         public Person Person { get; set; }
 
-        [Required]
         [DataType(DataType.Date)]
-        public DateOnly From { get; set; }
+        public DateTime? From { get; set; }
 
         [DataType(DataType.Date)]
-        public DateOnly? To { get; set; }
+        public DateTime? To { get; set; }
     }
 }

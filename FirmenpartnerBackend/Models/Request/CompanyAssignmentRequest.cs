@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace FirmenpartnerBackend.Models.Request
 {
@@ -13,12 +9,11 @@ namespace FirmenpartnerBackend.Models.Request
 
         [Required]
         public Guid PersonId { get; set; }
-        
-        [Required]
-        [DataType(DataType.Date)]
-        public DateOnly From { get; set; }
 
         [DataType(DataType.Date)]
-        public DateOnly? To { get; set; }
+        public DateTime? From { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime? To { get; set; }
     }
 }
