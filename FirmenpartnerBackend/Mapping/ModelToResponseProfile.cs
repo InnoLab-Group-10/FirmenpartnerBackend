@@ -10,6 +10,15 @@ namespace FirmenpartnerBackend.Mapping
         {
             CreateMap<Company, CompanyBaseResponse>();
             CreateMap<Company, CompanySingleResponse>();
+
+            CreateMap<CompanyLocation, CompanyLocationBaseResponse>();
+            CreateMap<CompanyLocation, CompanyLocationSingleResponse>();
+
+            CreateMap<CompanyAssignment, CompanyAssignmentBaseResponse>();
+            CreateMap<CompanyAssignment, CompanyAssignmentSingleResponse>();
+
+            CreateMap<Person, PersonBaseResponse>();
+            CreateMap<Person, PersonSingleResponse>();
         }
     }
 }

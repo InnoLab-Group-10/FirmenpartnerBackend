@@ -9,6 +9,12 @@ namespace FirmenpartnerBackend.Mapping
         public RequestToModelProfile()
         {
             CreateMap<CompanyRequest, Company>();
+
+            CreateMap<CompanyLocationRequest, CompanyLocation>();
+
+            CreateMap<CompanyAssignmentRequest, CompanyAssignment>();
+
+            CreateMap<PersonRequest, Person>();
         }
     }
 }
