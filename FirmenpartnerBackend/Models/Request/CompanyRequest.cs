@@ -10,6 +10,9 @@ namespace FirmenpartnerBackend.Models.Request
         [Required]
         public bool ContractSigned { get; set; }
 
+        [Required]
+        public int MaxStudents { get; set; }
+
         public string? Notes { get; set; }
     }
 }

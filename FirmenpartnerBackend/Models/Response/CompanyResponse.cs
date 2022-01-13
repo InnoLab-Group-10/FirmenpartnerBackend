@@ -5,7 +5,7 @@
         public Guid Id { get; set; }
         public string Name { get; set; }
         public bool ContractSigned { get; set; }
-
+        public int MaxStudents { get; set; }
         public string? Notes { get; set; }
     }
 
