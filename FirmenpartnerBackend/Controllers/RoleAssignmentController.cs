@@ -28,7 +28,7 @@ namespace FirmenpartnerBackend.Controllers
         [ProducesResponseType(typeof(GetAllRolesResponse), 200)]
         public async Task<IActionResult> GetRoles()
         {
-            List<string> roles = await Task.Run(() => roleManager.Roles.Select(r => r.Name).ToList());
+            List<string> roles = await Task.Run(() => roleManager.Roles.Where(r => r.Name != ApplicationRoles.ROOT).Select(r => r.Name).ToList());
             return Ok(new GetAllRolesResponse()
             {
                 Success = true,
@@ -64,6 +64,15 @@ namespace FirmenpartnerBackend.Controllers
                     {
                         Success = false,
                         Errors = new List<string>() { "No role with the provided ID exists." }
+                    });
+                }
+
+                if (role.Name == ApplicationRoles.ROOT)
+                {
+                    return BadRequest(new AssignRoleResponse()
+                    {
+                        Success = false,
+                        Errors = new List<string>() { "Cannot assign root role." }
                     });
                 }
 
@@ -128,6 +137,15 @@ namespace FirmenpartnerBackend.Controllers
                     {
                         Success = false,
                         Errors = new List<string>() { "No role with the provided ID exists." }
+                    });
+                }
+
+                if (role.Name == ApplicationRoles.ROOT)
+                {
+                    return BadRequest(new AssignRoleResponse()
+                    {
+                        Success = false,
+                        Errors = new List<string>() { "Cannot unassign root role." }
                     });
                 }
 

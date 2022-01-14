@@ -251,6 +251,52 @@ namespace FirmenpartnerBackend.Controllers
             }
         }
 
+        [HttpDelete]
+        [Route("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = ApplicationRoles.ADMIN)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200)]
+        public virtual async Task<IActionResult> Delete([FromRoute] Guid id)
+        {
+            if (ModelState.IsValid)
+            {
+                ApplicationUser? model = await userManager.FindByIdAsync(id.ToString());
+
+                if (model == null)
+                {
+                    return NotFound(new DeleteResponse()
+                    {
+                        Success = false,
+                        Errors = new List<string>() { "No entity with the given ID exists." }
+                    });
+                }
+
+                if (await userManager.IsInRoleAsync(model, ApplicationRoles.ROOT))
+                {
+                    return BadRequest(new DeleteResponse()
+                    {
+                        Success = false,
+                        Errors = new List<string>() { "Cannot delete root user." }
+                    });
+                }
+
+                await userManager.DeleteAsync(model);
+
+                return Ok(new DeleteResponse()
+                {
+                    Success = true
+                });
+            }
+
+            return BadRequest(new DeleteResponse()
+            {
+                Success = false,
+                Errors = new List<string>() { "Invalid request." }
+            });
+        }
+
         [HttpPost]
         [Route("change-password")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

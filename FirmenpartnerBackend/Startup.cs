@@ -220,6 +220,7 @@ namespace FirmenpartnerBackend
                 {
                     await userManager.AddToRoleAsync(rootUser, ApplicationRoles.USER);
                     await userManager.AddToRoleAsync(rootUser, ApplicationRoles.ADMIN);
+                    await userManager.AddToRoleAsync(rootUser, ApplicationRoles.ROOT);
                 }
             }
         }

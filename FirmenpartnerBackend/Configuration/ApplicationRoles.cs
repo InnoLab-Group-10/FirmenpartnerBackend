@@ -4,5 +4,6 @@
     {
         public const string USER = "User";
         public const string ADMIN = "Administrator";
+        public const string ROOT = "Root";
     }
 }
