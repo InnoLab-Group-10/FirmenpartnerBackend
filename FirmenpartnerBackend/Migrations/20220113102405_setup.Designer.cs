@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FirmenpartnerBackend.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20211227130742_Initial setup")]
-    partial class Initialsetup
+    [Migration("20220113102405_setup")]
+    partial class setup
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -56,6 +56,9 @@ namespace FirmenpartnerBackend.Migrations
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PasswordHash")
@@ -104,9 +107,14 @@ namespace FirmenpartnerBackend.Migrations
                     b.Property<bool>("ContractSigned")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("MaxStudents")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -123,13 +131,13 @@ namespace FirmenpartnerBackend.Migrations
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateOnly>("From")
+                    b.Property<DateTime?>("From")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("PersonId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateOnly?>("To")
+                    b.Property<DateTime?>("To")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -149,12 +157,10 @@ namespace FirmenpartnerBackend.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("City")
                         .IsRequired()
-                        .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CompanyId")
@@ -162,7 +168,6 @@ namespace FirmenpartnerBackend.Migrations
 
                     b.Property<string>("Zipcode")
                         .IsRequired()
-                        .HasMaxLength(12)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -172,7 +177,7 @@ namespace FirmenpartnerBackend.Migrations
                     b.ToTable("CompanyLocations");
                 });
 
-            modelBuilder.Entity("FirmenpartnerBackend.Models.Data.Contact", b =>
+            modelBuilder.Entity("FirmenpartnerBackend.Models.Data.Person", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -181,41 +186,24 @@ namespace FirmenpartnerBackend.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("PersonId")
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Phone")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("PersonId");
-
-                    b.ToTable("Contacts");
-                });
-
-            modelBuilder.Entity("FirmenpartnerBackend.Models.Data.Person", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Prefix")
-                        .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Suffix")
-                        .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -417,17 +405,6 @@ namespace FirmenpartnerBackend.Migrations
                         .IsRequired();
 
                     b.Navigation("Company");
-                });
-
-            modelBuilder.Entity("FirmenpartnerBackend.Models.Data.Contact", b =>
-                {
-                    b.HasOne("FirmenpartnerBackend.Models.Data.Person", "Person")
-                        .WithMany()
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("FirmenpartnerBackend.Models.Data.RefreshToken", b =>

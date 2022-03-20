@@ -393,3 +393,7 @@ FirmenpartnerBackend/appsettings.json
 FirmenpartnerBackend/debug.db-shm
 
 FirmenpartnerBackend/debug.db-wal
+
+FirmenpartnerBackend/debug.db_
+
+FirmenpartnerBackend/debug.db__

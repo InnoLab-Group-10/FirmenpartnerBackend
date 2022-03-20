@@ -2,7 +2,7 @@
 {
     public class CompanyAssignmentBaseResponse : ISingleResponse
     {
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         public Guid CompanyId { get; set; }
         public Guid PersonId { get; set; }
 

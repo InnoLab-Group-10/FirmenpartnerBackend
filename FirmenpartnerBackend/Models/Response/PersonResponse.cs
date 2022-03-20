@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace FirmenpartnerBackend.Models.Response
 {
     public class PersonBaseResponse : ISingleResponse
     {
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         public string FirstName { get; set; }
 
         public string LastName { get; set; }

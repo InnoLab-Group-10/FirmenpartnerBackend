@@ -8,19 +8,19 @@ namespace FirmenpartnerBackend.Mapping
     {
         public ModelToResponseProfile()
         {
-            CreateMap<Company, CompanyBaseResponse>();
-            CreateMap<Company, CompanySingleResponse>();
+            CreateMap<Company, CompanyBaseResponse>().ReverseMap();
+            CreateMap<Company, CompanySingleResponse>().ReverseMap();
 
-            CreateMap<CompanyLocation, CompanyLocationBaseResponse>();
-            CreateMap<CompanyLocation, CompanyLocationSingleResponse>();
+            CreateMap<CompanyLocation, CompanyLocationBaseResponse>().ReverseMap();
+            CreateMap<CompanyLocation, CompanyLocationSingleResponse>().ReverseMap();
 
-            CreateMap<CompanyAssignment, CompanyAssignmentBaseResponse>();
-            CreateMap<CompanyAssignment, CompanyAssignmentSingleResponse>();
+            CreateMap<CompanyAssignment, CompanyAssignmentBaseResponse>().ReverseMap();
+            CreateMap<CompanyAssignment, CompanyAssignmentSingleResponse>().ReverseMap();
 
-            CreateMap<Person, PersonBaseResponse>();
-            CreateMap<Person, PersonSingleResponse>();
+            CreateMap<Person, PersonBaseResponse>().ReverseMap();
+            CreateMap<Person, PersonSingleResponse>().ReverseMap();
 
-            CreateMap<PersonBaseResponse, ContactBaseResponse>();
+            CreateMap<PersonBaseResponse, ContactBaseResponse>().ReverseMap();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CsvHelper.Configuration;
 using FirmenpartnerBackend.Data;
 using FirmenpartnerBackend.Models.Data;
 using FirmenpartnerBackend.Models.Request;
@@ -16,7 +17,7 @@ namespace FirmenpartnerBackend.Controllers
     [ProducesResponseType(401)]
     public class CompanyAssignmentController : GenericController<CompanyAssignment, CompanyAssignmentBaseResponse, CompanyAssignmentSingleResponse, CompanyAssignmentMultiResponse, CompanyAssignmentRequest>
     {
-        public CompanyAssignmentController(ApiDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+        public CompanyAssignmentController(ApiDbContext dbContext, IMapper mapper, CsvConfiguration csvConfiguration) : base(dbContext, mapper, csvConfiguration)
         {
         }
 

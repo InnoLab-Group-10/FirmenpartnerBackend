@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FirmenpartnerBackend.Migrations
 {
-    public partial class Initialsetup : Migration
+    public partial class setup : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -32,6 +32,7 @@ namespace FirmenpartnerBackend.Migrations
                     LastName = table.Column<string>(type: "TEXT", nullable: true),
                     Prefix = table.Column<string>(type: "TEXT", nullable: true),
                     Suffix = table.Column<string>(type: "TEXT", nullable: true),
+                    Notes = table.Column<string>(type: "TEXT", nullable: true),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -57,8 +58,10 @@ namespace FirmenpartnerBackend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
-                    ContractSigned = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    ContractSigned = table.Column<bool>(type: "INTEGER", nullable: false),
+                    MaxStudents = table.Column<int>(type: "INTEGER", nullable: false),
+                    Notes = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -70,10 +73,13 @@ namespace FirmenpartnerBackend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    FirstName = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
-                    LastName = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
-                    Prefix = table.Column<string>(type: "TEXT", maxLength: 32, nullable: true),
-                    Suffix = table.Column<string>(type: "TEXT", maxLength: 32, nullable: true)
+                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
+                    LastName = table.Column<string>(type: "TEXT", nullable: false),
+                    Prefix = table.Column<string>(type: "TEXT", nullable: true),
+                    Suffix = table.Column<string>(type: "TEXT", nullable: true),
+                    Email = table.Column<string>(type: "TEXT", nullable: true),
+                    Phone = table.Column<string>(type: "TEXT", nullable: true),
+                    Notes = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -215,9 +221,9 @@ namespace FirmenpartnerBackend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Address = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
-                    City = table.Column<string>(type: "TEXT", maxLength: 64, nullable: false),
-                    Zipcode = table.Column<string>(type: "TEXT", maxLength: 12, nullable: false),
+                    Address = table.Column<string>(type: "TEXT", nullable: false),
+                    City = table.Column<string>(type: "TEXT", nullable: false),
+                    Zipcode = table.Column<string>(type: "TEXT", nullable: false),
                     CompanyId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -238,8 +244,8 @@ namespace FirmenpartnerBackend.Migrations
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     CompanyId = table.Column<Guid>(type: "TEXT", nullable: false),
                     PersonId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    From = table.Column<DateOnly>(type: "TEXT", nullable: false),
-                    To = table.Column<DateOnly>(type: "TEXT", nullable: true)
+                    From = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    To = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -252,26 +258,6 @@ namespace FirmenpartnerBackend.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_CompanyAssignments_People_PersonId",
-                        column: x => x.PersonId,
-                        principalTable: "People",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Contacts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    PersonId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: true),
-                    Phone = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Contacts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Contacts_People_PersonId",
                         column: x => x.PersonId,
                         principalTable: "People",
                         principalColumn: "Id",
@@ -331,11 +317,6 @@ namespace FirmenpartnerBackend.Migrations
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Contacts_PersonId",
-                table: "Contacts",
-                column: "PersonId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_UserId",
                 table: "RefreshTokens",
                 column: "UserId");
@@ -365,19 +346,16 @@ namespace FirmenpartnerBackend.Migrations
                 name: "CompanyLocations");
 
             migrationBuilder.DropTable(
-                name: "Contacts");
-
-            migrationBuilder.DropTable(
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Companies");
+                name: "People");
 
             migrationBuilder.DropTable(
-                name: "People");
+                name: "Companies");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

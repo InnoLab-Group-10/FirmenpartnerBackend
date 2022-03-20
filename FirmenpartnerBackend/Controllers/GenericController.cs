@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using CsvHelper;
+using CsvHelper.Configuration;
 using FirmenpartnerBackend.Data;
 using FirmenpartnerBackend.Models.Data;
+using FirmenpartnerBackend.Models.Request;
 using FirmenpartnerBackend.Models.Response;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -16,11 +19,13 @@ namespace FirmenpartnerBackend.Controllers
     {
         protected ApiDbContext dbContext;
         protected IMapper mapper;
+        protected CsvConfiguration csvConfiguration;
 
-        public GenericController(ApiDbContext dbContext, IMapper mapper)
+        public GenericController(ApiDbContext dbContext, IMapper mapper, CsvConfiguration csvConfiguration)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
+            this.csvConfiguration = csvConfiguration;
         }
 
         protected abstract DbSet<TModel> GetDbSet();
@@ -77,6 +82,30 @@ namespace FirmenpartnerBackend.Controllers
             });
         }
 
+        [HttpGet]
+        [Route("csv")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200)]
+        public virtual async Task<IActionResult> GetAllCsv()
+        {
+            List<TBaseResponse> results = await GetDbSet().Select(e => mapper.Map<TBaseResponse>(e)).ToListAsync();
+            string csvString;
+
+            using (var writer = new StringWriter())
+            using (var csvWriter = new CsvWriter(writer, csvConfiguration))
+            {
+                csvWriter.WriteRecords(results);
+                csvString = writer.ToString();
+            }
+
+            return Ok(new CsvResponse()
+            {
+                Success = true,
+                Csv = csvString
+            });
+        }
+
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(400)]
@@ -96,6 +125,85 @@ namespace FirmenpartnerBackend.Controllers
                 response.Success = true;
 
                 return Ok(response);
+            }
+
+            return BadRequest(new TSingleResponse()
+            {
+                Success = false,
+                Errors = new List<string>() { "Invalid request." }
+            });
+        }
+
+        [HttpPost]
+        [Route("csv")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200)]
+        public virtual async Task<IActionResult> ImportFromCsv([FromBody] CsvRequest request)
+        {
+            if (ModelState.IsValid)
+            {
+                List<TBaseResponse> csvEntries = new List<TBaseResponse>();
+
+                try
+                {
+                    using (var reader = new StringReader(request.Csv))
+                    using (var csv = new CsvReader(reader, csvConfiguration))
+                    {
+                        IEnumerable<TBaseResponse> rows = csv.GetRecords<TBaseResponse>();
+                        foreach (TBaseResponse row in rows)
+                        {
+                            csvEntries.Add(row);
+                        }
+                    }
+                }
+                catch
+                {
+                    return BadRequest(new TMultiResponse()
+                    {
+                        Success = false,
+                        Errors = new List<string>() { "Invalid CSV." }
+                    });
+                }
+
+                List<TBaseResponse> updated = new List<TBaseResponse>();
+
+                foreach (TBaseResponse csvEntry in csvEntries)
+                {
+                    TModel? trackedModel = null;
+                    if (csvEntry.Id.HasValue)
+                    {
+                        Guid guid = csvEntry.Id.Value;
+                        trackedModel = await GetDbSet().FindAsync(guid); // Why won't you work??
+                    }
+
+                    if (trackedModel != null) // Entry exists already, update if needed
+                    {
+                        TModel modifiedModel = mapper.Map<TModel>(csvEntry);
+                        modifiedModel.Id = csvEntry.Id.Value;
+
+                        dbContext.Entry(trackedModel).CurrentValues.SetValues(modifiedModel);
+
+                        updated.Add(mapper.Map<TBaseResponse>(modifiedModel));
+                    }
+                    else // Entry doesn't exist, create it
+                    {
+                        TModel model = mapper.Map<TModel>(csvEntry);
+                        model.Id = Guid.NewGuid();
+
+                        await GetDbSet().AddAsync(model);
+                        updated.Add(mapper.Map<TBaseResponse>(model));
+                    }
+                }
+
+                await dbContext.SaveChangesAsync();
+
+                return Ok(new TMultiResponse()
+                {
+                    Success = true,
+                    Results = updated
+                });
             }
 
             return BadRequest(new TSingleResponse()

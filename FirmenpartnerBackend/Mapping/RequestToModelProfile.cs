@@ -8,13 +8,13 @@ namespace FirmenpartnerBackend.Mapping
     {
         public RequestToModelProfile()
         {
-            CreateMap<CompanyRequest, Company>();
+            CreateMap<CompanyRequest, Company>().ReverseMap();
 
-            CreateMap<CompanyLocationRequest, CompanyLocation>();
+            CreateMap<CompanyLocationRequest, CompanyLocation>().ReverseMap();
 
-            CreateMap<CompanyAssignmentRequest, CompanyAssignment>();
+            CreateMap<CompanyAssignmentRequest, CompanyAssignment>().ReverseMap();
 
-            CreateMap<PersonRequest, Person>();
+            CreateMap<PersonRequest, Person>().ReverseMap();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using FirmenpartnerBackend.Configuration;
+﻿using CsvHelper.Configuration;
+using FirmenpartnerBackend.Configuration;
 using FirmenpartnerBackend.Data;
 using FirmenpartnerBackend.Mapping;
 using FirmenpartnerBackend.Models.Data;
@@ -144,7 +145,17 @@ namespace FirmenpartnerBackend
 
             services.AddScoped<IAuthTokenService, AuthTokenService>();
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
+
+            // Configuration
+
+            CsvConfiguration csvConfiguration = new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)
+            {
+                Delimiter = ";"
+            };
+
+            services.AddSingleton(csvConfiguration);
         }
+
 
         public async void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
