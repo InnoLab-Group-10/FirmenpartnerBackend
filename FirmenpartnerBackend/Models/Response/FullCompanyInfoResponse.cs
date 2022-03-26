@@ -4,10 +4,10 @@
     {
         public CompanyBaseResponse Company { get; set; }
         public List<CompanyLocationBaseResponse> Locations { get; set; }
-        public List<ContactBaseResponse> Contacts { get; set; }
+        public List<ContactAssignmentBaseResponse> Contacts { get; set; }
     }
 
-    public class ContactBaseResponse : PersonBaseResponse
+    public class ContactAssignmentBaseResponse : ContactBaseResponse
     {
         public DateTime? From { get; set; }
         public DateTime? To { get; set; }

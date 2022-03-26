@@ -15,6 +15,13 @@ namespace FirmenpartnerBackend.Mapping
             CreateMap<CompanyAssignmentRequest, CompanyAssignment>().ReverseMap();
 
             CreateMap<PersonRequest, Person>().ReverseMap();
+
+            CreateMap<ContactRequest, Contact>().ReverseMap();
+
+            CreateMap<StudentRequest, Student>().ReverseMap();
+
+            CreateMap<ProgramRequest, Models.Data.Program>().ReverseMap();
+
         }
     }
 }

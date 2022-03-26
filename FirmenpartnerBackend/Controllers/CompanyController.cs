@@ -48,7 +48,7 @@ namespace FirmenpartnerBackend.Controllers
             foreach (Company company in companies)
             {
                 List<CompanyLocationBaseResponse>? locationResponses = null;
-                List<ContactBaseResponse>? contactResponses = null;
+                List<ContactAssignmentBaseResponse>? contactResponses = null;
 
                 IGrouping<Guid, CompanyLocation> locGroups;
                 if (locations.TryGetValue(company.Id, out locGroups))
@@ -61,7 +61,7 @@ namespace FirmenpartnerBackend.Controllers
                 {
                     contactResponses = assignGroups.Select(a =>
                     {
-                        ContactBaseResponse r = mapper.Map<ContactBaseResponse>(a.Person);
+                        ContactAssignmentBaseResponse r = mapper.Map<ContactAssignmentBaseResponse>(a.Person);
                         r.From = a.Assignment.From;
                         r.To = a.Assignment.To;
 
@@ -73,7 +73,7 @@ namespace FirmenpartnerBackend.Controllers
                 {
                     Company = mapper.Map<CompanyBaseResponse>(company),
                     Locations = locationResponses == null ? new List<CompanyLocationBaseResponse>() : locationResponses,
-                    Contacts = contactResponses == null ? new List<ContactBaseResponse>() : contactResponses
+                    Contacts = contactResponses == null ? new List<ContactAssignmentBaseResponse>() : contactResponses
                 });
             }
 
