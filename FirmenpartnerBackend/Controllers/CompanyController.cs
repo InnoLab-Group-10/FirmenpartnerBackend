@@ -41,18 +41,18 @@ namespace FirmenpartnerBackend.Controllers
                     mapper.Map<PersonBaseResponse>(person)
                 ))
                 .AsEnumerable()
-                .GroupBy(c => c.Assignment.Company.Id)
+                .GroupBy(c => c.Assignment.CompanyId)
                 .ToDictionary(x => x.Key);
 
             foreach (Company company in companies)
             {
-                List<CompanyLocationBaseResponse>? locationResponses = null;
-                List<ContactAssignmentBaseResponse>? contactResponses = null;
+                List<CompanyGetAllLocationBaseResponse>? locationResponses = null;
+                List<CompanyGetAllContactAssignmentBaseResponse>? contactResponses = null;
 
                 IGrouping<Guid, CompanyLocation> locGroups;
                 if (locations.TryGetValue(company.Id, out locGroups))
                 {
-                    locationResponses = locGroups.Select(loc => mapper.Map<CompanyLocationBaseResponse>(loc)).ToList();
+                    locationResponses = locGroups.Select(loc => mapper.Map<CompanyGetAllLocationBaseResponse>(loc)).ToList();
                 }
 
                 IGrouping<Guid, GetAllFullContactsEntry> assignGroups;
@@ -60,7 +60,7 @@ namespace FirmenpartnerBackend.Controllers
                 {
                     contactResponses = assignGroups.Select(a =>
                     {
-                        ContactAssignmentBaseResponse r = mapper.Map<ContactAssignmentBaseResponse>(a.Person);
+                        CompanyGetAllContactAssignmentBaseResponse r = mapper.Map<CompanyGetAllContactAssignmentBaseResponse>(a.Person);
                         r.From = a.Assignment.From;
                         r.To = a.Assignment.To;
 
@@ -71,8 +71,8 @@ namespace FirmenpartnerBackend.Controllers
                 responses.Add(new FullCompanyInfoResponse()
                 {
                     Company = mapper.Map<CompanyBaseResponse>(company),
-                    Locations = locationResponses == null ? new List<CompanyLocationBaseResponse>() : locationResponses,
-                    Contacts = contactResponses == null ? new List<ContactAssignmentBaseResponse>() : contactResponses
+                    Locations = locationResponses == null ? new List<CompanyGetAllLocationBaseResponse>() : locationResponses,
+                    Contacts = contactResponses == null ? new List<CompanyGetAllContactAssignmentBaseResponse>() : contactResponses
                 });
             }
 

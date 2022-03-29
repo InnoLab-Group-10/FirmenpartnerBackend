@@ -30,7 +30,7 @@ namespace FirmenpartnerBackend.Controllers
 
         protected override void LoadRelated(EntityEntry<CompanyLocation> entry)
         {
-            entry.Reference(e => e.Company).Load();
+            //entry.Reference(e => e.Company).Load();
         }
     }
 }

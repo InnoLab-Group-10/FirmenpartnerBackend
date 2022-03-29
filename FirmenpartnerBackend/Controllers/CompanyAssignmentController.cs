@@ -29,8 +29,8 @@ namespace FirmenpartnerBackend.Controllers
 
         protected override void LoadRelated(EntityEntry<CompanyAssignment> entry)
         {
-            entry.Reference(e => e.Company).Load();
-            entry.Reference(e => e.Person).Load();
+            //entry.Reference(e => e.Company).Load();
+            //entry.Reference(e => e.Person).Load();
         }
     }
 }

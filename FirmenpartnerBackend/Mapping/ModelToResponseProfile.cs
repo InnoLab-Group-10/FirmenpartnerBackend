@@ -13,6 +13,7 @@ namespace FirmenpartnerBackend.Mapping
 
             CreateMap<CompanyLocation, CompanyLocationBaseResponse>().ReverseMap();
             CreateMap<CompanyLocation, CompanyLocationSingleResponse>().ReverseMap();
+            CreateMap<CompanyLocation, CompanyGetAllLocationBaseResponse>().ReverseMap();
 
             CreateMap<CompanyAssignment, CompanyAssignmentBaseResponse>().ReverseMap();
             CreateMap<CompanyAssignment, CompanyAssignmentSingleResponse>().ReverseMap();
@@ -29,7 +30,7 @@ namespace FirmenpartnerBackend.Mapping
             CreateMap<Models.Data.Program, ProgramBaseResponse>().ReverseMap();
             CreateMap<Models.Data.Program, ProgramSingleResponse>().ReverseMap();
 
-            CreateMap<PersonBaseResponse, ContactAssignmentBaseResponse>().ReverseMap();
+            CreateMap<PersonBaseResponse, CompanyGetAllContactAssignmentBaseResponse>().ReverseMap();
         }
     }
 }
