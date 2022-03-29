@@ -22,13 +22,12 @@ namespace FirmenpartnerBackend.Controllers
         }
 
         [HttpGet]
-        [Route("full")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(200)]
-        public virtual async Task<IActionResult> GetAllFull()
+        public override async Task<IActionResult> GetAll()
         {
             List<FullCompanyInfoResponse> responses = new List<FullCompanyInfoResponse>();
 
@@ -42,7 +41,7 @@ namespace FirmenpartnerBackend.Controllers
                     mapper.Map<PersonBaseResponse>(person)
                 ))
                 .AsEnumerable()
-                .GroupBy(c => c.Assignment.CompanyId)
+                .GroupBy(c => c.Assignment.Company.Id)
                 .ToDictionary(x => x.Key);
 
             foreach (Company company in companies)
@@ -83,7 +82,6 @@ namespace FirmenpartnerBackend.Controllers
         protected override DbSet<Company> GetDbSet()
         {
             return dbContext.Companies;
-
         }
 
         private record GetAllFullContactsEntry(CompanyAssignmentBaseResponse Assignment, PersonBaseResponse Person);

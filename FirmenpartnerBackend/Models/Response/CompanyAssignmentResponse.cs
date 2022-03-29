@@ -1,13 +1,13 @@
-﻿namespace FirmenpartnerBackend.Models.Response
+﻿using FirmenpartnerBackend.Models.Data;
+
+namespace FirmenpartnerBackend.Models.Response
 {
     public class CompanyAssignmentBaseResponse : ISingleResponse
     {
         public Guid? Id { get; set; }
-        public Guid CompanyId { get; set; }
-        public Guid PersonId { get; set; }
-
+        public Company Company { get; set; }
+        public Person Person { get; set; }
         public DateTime? From { get; set; }
-
         public DateTime? To { get; set; }
     }
 

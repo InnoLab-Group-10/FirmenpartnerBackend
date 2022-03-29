@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace FirmenpartnerBackend.Controllers
 {
@@ -25,7 +26,11 @@ namespace FirmenpartnerBackend.Controllers
         protected override DbSet<CompanyLocation> GetDbSet()
         {
             return dbContext.CompanyLocations;
+        }
 
+        protected override void LoadRelated(EntityEntry<CompanyLocation> entry)
+        {
+            entry.Reference(e => e.Company).Load();
         }
     }
 }

@@ -54,6 +54,7 @@ namespace FirmenpartnerBackend.Controllers
                         Success = true,
                         Token = result.Token,
                         RefreshToken = result.RefreshToken,
+                        UserId = new Guid(existingUser.Id)
                     });
                 }
                 else

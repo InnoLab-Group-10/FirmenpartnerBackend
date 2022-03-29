@@ -34,11 +34,31 @@ namespace FirmenpartnerBackend.Controllers
         [ProducesResponseType(typeof(GetAllUsersResponse), 200)]
         public async Task<IActionResult> GetAllUsers()
         {
-            List<string> users = userManager.Users.Select(u => u.Id).ToList();
-            return Ok(new GetAllUsersResponse()
+            //List<string> users = userManager.Users.Select(u => u.Id).ToList();
+            //return Ok(new GetAllUsersResponse()
+            //{
+            //    Success = true,
+            //    Users = users
+            //});
+
+            List<UserBaseResponse> users = userManager.Users.Select(user => new UserBaseResponse()
+            {
+                Id = new Guid(user.Id),
+                Username = user.UserName,
+                Prefix = user.Prefix,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Suffix = user.Suffix,
+                Email = user.Email,
+                Phone = user.PhoneNumber,
+                Notes = user.Notes,
+                Roles = userManager.GetRolesAsync(user).Result.ToList()
+            }).ToList();
+
+            return Ok(new UserMultiResponse()
             {
                 Success = true,
-                Users = users
+                Results = users
             });
         }
 
@@ -56,7 +76,7 @@ namespace FirmenpartnerBackend.Controllers
 
                 if (user == null)
                 {
-                    return BadRequest(new GetUserResponse()
+                    return BadRequest(new UserSingleResponse()
                     {
                         Success = false,
                         Errors = new List<string>() { "No user with the given ID exists." }
@@ -66,10 +86,24 @@ namespace FirmenpartnerBackend.Controllers
                 {
                     List<string> roles = (await userManager.GetRolesAsync(user)).ToList();
 
-                    return Ok(new GetUserResponse()
+                    //return Ok(new GetUserResponse()
+                    //{
+                    //    Success = true,
+                    //    Id = user.Id,
+                    //    Username = user.UserName,
+                    //    Prefix = user.Prefix,
+                    //    FirstName = user.FirstName,
+                    //    LastName = user.LastName,
+                    //    Suffix = user.Suffix,
+                    //    Email = user.Email,
+                    //    Phone = user.PhoneNumber,
+                    //    Roles = roles
+                    //});
+
+                    return Ok(new UserSingleResponse()
                     {
                         Success = true,
-                        Id = user.Id,
+                        Id = new Guid(user.Id),
                         Username = user.UserName,
                         Prefix = user.Prefix,
                         FirstName = user.FirstName,
@@ -77,13 +111,14 @@ namespace FirmenpartnerBackend.Controllers
                         Suffix = user.Suffix,
                         Email = user.Email,
                         Phone = user.PhoneNumber,
+                        Notes = user.Notes,
                         Roles = roles
                     });
                 }
 
             }
 
-            return BadRequest(new GetUserResponse()
+            return BadRequest(new UserSingleResponse()
             {
                 Success = false,
                 Errors = new List<string>() { "Invalid request." }
@@ -139,7 +174,8 @@ namespace FirmenpartnerBackend.Controllers
                             {
                                 Success = true,
                                 Token = result.Token,
-                                RefreshToken = result.RefreshToken
+                                RefreshToken = result.RefreshToken,
+                                UserId = new Guid(newUser.Id)
                             });
                         }
                         else
@@ -187,7 +223,7 @@ namespace FirmenpartnerBackend.Controllers
 
                 if (trackedModel == null)
                 {
-                    return NotFound(new GetUserResponse()
+                    return NotFound(new UserSingleResponse()
                     {
                         Success = false,
                         Errors = new List<string>() { "No entity with the given ID exists." }
@@ -226,10 +262,10 @@ namespace FirmenpartnerBackend.Controllers
 
                     List<string> roles = (await userManager.GetRolesAsync(trackedModel)).ToList();
 
-                    return Ok(new GetUserResponse()
+                    return Ok(new UserSingleResponse()
                     {
                         Success = true,
-                        Id = trackedModel.Id,
+                        Id = new Guid(trackedModel.Id),
                         Username = trackedModel.UserName,
                         Prefix = trackedModel.Prefix,
                         FirstName = trackedModel.FirstName,
@@ -237,13 +273,14 @@ namespace FirmenpartnerBackend.Controllers
                         Suffix = trackedModel.Suffix,
                         Email = trackedModel.Email,
                         Phone = trackedModel.PhoneNumber,
+                        Notes = trackedModel.Notes,
                         Roles = roles
                     });
                 }
             }
             else
             {
-                return BadRequest(new GetUserResponse()
+                return BadRequest(new UserSingleResponse()
                 {
                     Success = false,
                     Errors = new List<string>() { "Invalid request." }

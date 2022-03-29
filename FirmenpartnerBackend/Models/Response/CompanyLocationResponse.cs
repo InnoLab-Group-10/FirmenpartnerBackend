@@ -1,4 +1,6 @@
-﻿namespace FirmenpartnerBackend.Models.Response
+﻿using FirmenpartnerBackend.Models.Data;
+
+namespace FirmenpartnerBackend.Models.Response
 {
     public class CompanyLocationBaseResponse : ISingleResponse
     {
@@ -10,7 +12,7 @@
 
         public string Zipcode { get; set; }
 
-        public Guid CompanyId { get; set; }
+        public Company Company { get; set; }
     }
 
     public class CompanyLocationSingleResponse : CompanyLocationBaseResponse, IResponse

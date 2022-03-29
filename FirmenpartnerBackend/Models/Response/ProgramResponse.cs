@@ -6,7 +6,7 @@
         public string Name { get; set; }
     }
 
-    public class ProgramSingleResponse : CompanyBaseResponse, IResponse
+    public class ProgramSingleResponse : ProgramBaseResponse, IResponse
     {
         public bool Success { get; set; }
         public List<string> Errors { get; set; }

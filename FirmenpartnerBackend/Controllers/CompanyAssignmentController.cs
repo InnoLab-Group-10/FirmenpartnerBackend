@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace FirmenpartnerBackend.Controllers
 {
@@ -24,7 +25,12 @@ namespace FirmenpartnerBackend.Controllers
         protected override DbSet<CompanyAssignment> GetDbSet()
         {
             return dbContext.CompanyAssignments;
+        }
 
+        protected override void LoadRelated(EntityEntry<CompanyAssignment> entry)
+        {
+            entry.Reference(e => e.Company).Load();
+            entry.Reference(e => e.Person).Load();
         }
     }
 }

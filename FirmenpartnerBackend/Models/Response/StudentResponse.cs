@@ -3,12 +3,9 @@
     public class StudentBaseResponse : PersonBaseResponse
     {
         public Guid? Id { get; set; }
-
         public string StudentId { get; set; }
-
         public int Semester { get; set; }
-
-        public Guid ProgramId { get; set; }
+        public Data.Program Program { get; set; }
     }
 
     public class StudentSingleResponse : StudentBaseResponse, IResponse

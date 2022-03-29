@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace FirmenpartnerBackend.Controllers
 {
@@ -29,6 +30,7 @@ namespace FirmenpartnerBackend.Controllers
         }
 
         protected abstract DbSet<TModel> GetDbSet();
+        protected virtual void LoadRelated(EntityEntry<TModel> entry) { }
 
         [HttpGet]
         [Route("{id}")]
@@ -53,6 +55,7 @@ namespace FirmenpartnerBackend.Controllers
                 }
                 else
                 {
+                    LoadRelated(dbContext.Entry(model));
                     TSingleResponse response = mapper.Map<TSingleResponse>(model);
                     response.Success = true;
 
@@ -74,7 +77,14 @@ namespace FirmenpartnerBackend.Controllers
         [ProducesResponseType(200)]
         public virtual async Task<IActionResult> GetAll()
         {
-            List<TBaseResponse> results = await GetDbSet().Select(e => mapper.Map<TBaseResponse>(e)).ToListAsync();
+            List<TModel> models = await GetDbSet().ToListAsync();
+
+            foreach (TModel model in models)
+            {
+                LoadRelated(dbContext.Entry(model));
+            }
+
+            List<TBaseResponse> results = models.Select(e => mapper.Map<TBaseResponse>(e)).ToList();
             return Ok(new TMultiResponse()
             {
                 Success = true,
