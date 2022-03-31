@@ -156,7 +156,7 @@ namespace FirmenpartnerBackend.Controllers
                     });
                 }
 
-                ApplicationUser? newUser = new ApplicationUser() { Email = user.Email, UserName = user.Name };
+                ApplicationUser? newUser = new ApplicationUser() { Email = user.Email, UserName = user.Username };
                 IdentityResult? isCreated = await userManager.CreateAsync(newUser, user.Password);
                 List<string> errors = new List<string>();
 

@@ -29,7 +29,7 @@ namespace FirmenpartnerBackend.Controllers
         [ProducesResponseType(200)]
         public override async Task<IActionResult> GetAll()
         {
-            List<FullCompanyInfoResponse> responses = new List<FullCompanyInfoResponse>();
+            List<FullCompanyInfoResponseEntry> responses = new List<FullCompanyInfoResponseEntry>();
 
             List<Company> companies = await dbContext.Companies.ToListAsync();
 
@@ -68,7 +68,7 @@ namespace FirmenpartnerBackend.Controllers
                     }).ToList();
                 }
 
-                responses.Add(new FullCompanyInfoResponse()
+                responses.Add(new FullCompanyInfoResponseEntry()
                 {
                     Company = mapper.Map<CompanyBaseResponse>(company),
                     Locations = locationResponses == null ? new List<CompanyGetAllLocationBaseResponse>() : locationResponses,
@@ -76,7 +76,11 @@ namespace FirmenpartnerBackend.Controllers
                 });
             }
 
-            return Ok(responses);
+            return Ok(new FullCompanyInfoResponse()
+            {
+                Success = true,
+                Results = responses
+            });
         }
 
         protected override DbSet<Company> GetDbSet()
