@@ -3,6 +3,7 @@ using System;
 using FirmenpartnerBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FirmenpartnerBackend.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220424110608_Added timeline and notification tables")]
+    partial class Addedtimelineandnotificationtables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.3");
@@ -185,8 +187,7 @@ namespace FirmenpartnerBackend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("RecipientId")
-                        .IsRequired()
+                    b.Property<Guid>("RecipientId")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Timestamp")
@@ -505,7 +506,7 @@ namespace FirmenpartnerBackend.Migrations
 
             modelBuilder.Entity("FirmenpartnerBackend.Models.Data.Notification", b =>
                 {
-                    b.HasOne("FirmenpartnerBackend.Models.Data.ApplicationUser", "Recipient")
+                    b.HasOne("FirmenpartnerBackend.Models.Data.Person", "Recipient")
                         .WithMany()
                         .HasForeignKey("RecipientId")
                         .OnDelete(DeleteBehavior.Cascade)

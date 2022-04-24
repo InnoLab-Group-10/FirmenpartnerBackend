@@ -30,6 +30,12 @@ namespace FirmenpartnerBackend.Mapping
             CreateMap<Models.Data.Program, ProgramBaseResponse>().ReverseMap();
             CreateMap<Models.Data.Program, ProgramSingleResponse>().ReverseMap();
 
+            CreateMap<Notification, NotificationBaseResponse>().ReverseMap();
+            CreateMap<Notification, NotificationSingleResponse>().ReverseMap();
+
+            CreateMap<TimelineEntry, TimelineEntryBaseResponse>().ReverseMap();
+            CreateMap<TimelineEntry, TimelineEntrySingleResponse>().ReverseMap();
+
             CreateMap<PersonBaseResponse, CompanyGetAllContactAssignmentBaseResponse>().ReverseMap();
         }
     }

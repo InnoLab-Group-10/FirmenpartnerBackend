@@ -20,6 +20,10 @@ namespace FirmenpartnerBackend.Mapping
 
             CreateMap<StudentRequest, Student>().ReverseMap();
 
+            CreateMap<NotificationRequest, Notification>().ReverseMap();
+
+            CreateMap<TimelineEntryRequest, TimelineEntry>().ReverseMap();
+
             CreateMap<ProgramRequest, Models.Data.Program>().ReverseMap();
 
         }
