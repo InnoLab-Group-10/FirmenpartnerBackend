@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CsvHelper;
 using CsvHelper.Configuration;
 using FirmenpartnerBackend.Data;
 using FirmenpartnerBackend.Models.Data;
@@ -20,6 +21,30 @@ namespace FirmenpartnerBackend.Controllers
     {
         public StudentController(ApiDbContext dbContext, IMapper mapper, CsvConfiguration csvConfiguration) : base(dbContext, mapper, csvConfiguration)
         {
+        }
+
+        [HttpGet]
+        [Route("csv")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200)]
+        public override async Task<IActionResult> GetAllCsv()
+        {
+            List<StudentBaseCsvResponse> results = await GetDbSet().Select(e => mapper.Map<StudentBaseCsvResponse>(e)).ToListAsync();
+            string csvString;
+
+            using (var writer = new StringWriter())
+            using (var csvWriter = new CsvWriter(writer, csvConfiguration))
+            {
+                csvWriter.WriteRecords(results);
+                csvString = writer.ToString();
+            }
+
+            return Ok(new CsvResponse()
+            {
+                Success = true,
+                Csv = csvString
+            });
         }
 
         protected override DbSet<Student> GetDbSet()

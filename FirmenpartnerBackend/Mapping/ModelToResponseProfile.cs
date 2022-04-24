@@ -25,6 +25,7 @@ namespace FirmenpartnerBackend.Mapping
             CreateMap<Contact, ContactSingleResponse>().ReverseMap();
 
             CreateMap<Student, StudentBaseResponse>().ReverseMap();
+            CreateMap<Student, StudentBaseCsvResponse>().ReverseMap();
             CreateMap<Student, StudentSingleResponse>().ReverseMap();
 
             CreateMap<Models.Data.Program, ProgramBaseResponse>().ReverseMap();
