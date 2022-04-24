@@ -36,6 +36,9 @@ namespace FirmenpartnerBackend.Mapping
             CreateMap<TimelineEntry, TimelineEntryBaseResponse>().ReverseMap();
             CreateMap<TimelineEntry, TimelineEntrySingleResponse>().ReverseMap();
 
+            CreateMap<FileEntry, FileBaseResponse>().ReverseMap();
+            CreateMap<FileEntry, FileSingleResponse>().ReverseMap();
+
             CreateMap<PersonBaseResponse, CompanyGetAllContactAssignmentBaseResponse>().ReverseMap();
         }
     }

@@ -154,6 +154,15 @@ namespace FirmenpartnerBackend
             };
 
             services.AddSingleton(csvConfiguration);
+
+            IConfiguration uploadConfigSection = Configuration.GetSection("FileUploadConfig");
+            FileUploadConfig uploadConfig = uploadConfigSection.Get<FileUploadConfig>();
+
+            services.AddSingleton(uploadConfig);
+
+            // Create needed directories for file uploads
+
+            if (!Directory.Exists(uploadConfig.TargetPath)) Directory.CreateDirectory(uploadConfig.TargetPath);
         }
 
 

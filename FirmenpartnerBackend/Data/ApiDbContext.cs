@@ -16,6 +16,7 @@ namespace FirmenpartnerBackend.Data
         public DbSet<CompanyAssignment> CompanyAssignments { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<TimelineEntry> TimelineEntries { get; set; }
+        public DbSet<FileEntry> FileEntries { get; set; }
 
 
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)
