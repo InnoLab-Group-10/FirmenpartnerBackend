@@ -1,15 +1,16 @@
 ﻿using AutoMapper;
 using CsvHelper;
 using CsvHelper.Configuration;
+using FirmenpartnerBackend.Configuration;
 using FirmenpartnerBackend.Data;
 using FirmenpartnerBackend.Models.Data;
-using FirmenpartnerBackend.Models.Request;
 using FirmenpartnerBackend.Models.Response;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Text;
 
 namespace FirmenpartnerBackend.Controllers
 {
@@ -21,12 +22,14 @@ namespace FirmenpartnerBackend.Controllers
         protected ApiDbContext dbContext;
         protected IMapper mapper;
         protected CsvConfiguration csvConfiguration;
+        protected FileUploadConfig fileUploadConfig;
 
-        public GenericController(ApiDbContext dbContext, IMapper mapper, CsvConfiguration csvConfiguration)
+        protected GenericController(ApiDbContext dbContext, IMapper mapper, CsvConfiguration csvConfiguration, FileUploadConfig fileUploadConfig)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
             this.csvConfiguration = csvConfiguration;
+            this.fileUploadConfig = fileUploadConfig;
         }
 
         protected abstract DbSet<TModel> GetDbSet();
@@ -109,11 +112,7 @@ namespace FirmenpartnerBackend.Controllers
                 csvString = writer.ToString();
             }
 
-            return Ok(new CsvResponse()
-            {
-                Success = true,
-                Csv = csvString
-            });
+            return File(Encoding.UTF8.GetBytes(csvString), "text/csv", fileDownloadName: $"{typeof(TModel).Name}_Export.csv");
         }
 
         [HttpPost]
@@ -150,15 +149,23 @@ namespace FirmenpartnerBackend.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(200)]
-        public virtual async Task<IActionResult> ImportFromCsv([FromBody] CsvRequest request)
+        public virtual async Task<IActionResult> ImportFromCsv(IFormFile file)
         {
             if (ModelState.IsValid)
             {
                 List<TBaseResponse> csvEntries = new List<TBaseResponse>();
 
+
+                if (file == null || file.Length > fileUploadConfig.MaxSize) return BadRequest(new TMultiResponse()
+                {
+                    Success = false,
+                    Errors = new List<string>() { $"Invalid file size. Uploaded files can be at most {fileUploadConfig.MaxSize} bytes." }
+                });
+
                 try
                 {
-                    using (var reader = new StringReader(request.Csv))
+                    using (var stream = file.OpenReadStream())
+                    using (var reader = new StreamReader(stream))
                     using (var csv = new CsvReader(reader, csvConfiguration))
                     {
                         IEnumerable<TBaseResponse> rows = csv.GetRecords<TBaseResponse>();
@@ -216,7 +223,7 @@ namespace FirmenpartnerBackend.Controllers
                 });
             }
 
-            return BadRequest(new TSingleResponse()
+            return BadRequest(new TMultiResponse()
             {
                 Success = false,
                 Errors = new List<string>() { "Invalid request." }

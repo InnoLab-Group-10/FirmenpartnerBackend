@@ -7,7 +7,7 @@
         public Data.Program Program { get; set; }
     }
 
-    public class StudentBaseCsvResponse : PersonBaseResponse
+    public class StudentCsvBaseResponse : PersonBaseResponse
     {
         public string StudentId { get; set; }
         public int Semester { get; set; }
@@ -26,5 +26,12 @@
         public bool Success { get; set; }
         public List<string> Errors { get; set; }
         public List<StudentBaseResponse> Results { get; set; }
+    }
+
+    public class StudentCsvMultiResponse : IMultiResponse<StudentCsvBaseResponse>, IResponse
+    {
+        public bool Success { get; set; }
+        public List<string> Errors { get; set; }
+        public List<StudentCsvBaseResponse> Results { get; set; }
     }
 }

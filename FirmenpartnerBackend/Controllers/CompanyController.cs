@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CsvHelper.Configuration;
+using FirmenpartnerBackend.Configuration;
 using FirmenpartnerBackend.Data;
 using FirmenpartnerBackend.Models.Data;
 using FirmenpartnerBackend.Models.Request;
@@ -17,7 +18,7 @@ namespace FirmenpartnerBackend.Controllers
     [ProducesResponseType(401)]
     public class CompanyController : GenericController<Company, CompanyBaseResponse, CompanySingleResponse, CompanyMultiResponse, CompanyRequest>
     {
-        public CompanyController(ApiDbContext dbContext, IMapper mapper, CsvConfiguration csvConfiguration) : base(dbContext, mapper, csvConfiguration)
+        public CompanyController(ApiDbContext dbContext, IMapper mapper, CsvConfiguration csvConfiguration, FileUploadConfig fileUploadConfig) : base(dbContext, mapper, csvConfiguration, fileUploadConfig)
         {
         }
 

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CsvHelper.Configuration;
+using FirmenpartnerBackend.Configuration;
 using FirmenpartnerBackend.Data;
 using FirmenpartnerBackend.Models.Request;
 using FirmenpartnerBackend.Models.Response;
@@ -16,7 +17,7 @@ namespace FirmenpartnerBackend.Controllers
     [ProducesResponseType(401)]
     public class ProgramController : GenericController<Models.Data.Program, ProgramBaseResponse, ProgramSingleResponse, ProgramMultiResponse, ProgramRequest>
     {
-        public ProgramController(ApiDbContext dbContext, IMapper mapper, CsvConfiguration csvConfiguration) : base(dbContext, mapper, csvConfiguration)
+        public ProgramController(ApiDbContext dbContext, IMapper mapper, CsvConfiguration csvConfiguration, FileUploadConfig fileUploadConfig) : base(dbContext, mapper, csvConfiguration, fileUploadConfig)
         {
         }
 

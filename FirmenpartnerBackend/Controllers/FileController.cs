@@ -69,7 +69,7 @@ namespace FirmenpartnerBackend.Controllers
 
                     if (System.IO.File.Exists(filePath))
                     {
-                        return PhysicalFile(Path.GetFullPath(filePath), "application/force-download", fileDownloadName: model.Name);
+                        return PhysicalFile(Path.GetFullPath(filePath), "application/octet-stream", fileDownloadName: model.Name);
                     }
                     else
                     {
