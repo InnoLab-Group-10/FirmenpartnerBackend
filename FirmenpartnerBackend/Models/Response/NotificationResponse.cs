@@ -3,6 +3,9 @@
     public class NotificationBaseResponse : ISingleResponse
     {
         public Guid? Id { get; set; }
+
+        public DateTime Timestamp { get; set; }
+
         public string Message { get; set; }
 
         public Guid RecipientId { get; set; }
