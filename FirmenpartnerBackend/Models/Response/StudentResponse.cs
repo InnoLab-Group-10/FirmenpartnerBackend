@@ -4,7 +4,7 @@
     {
         public string StudentId { get; set; }
         public int Semester { get; set; }
-        public Data.Program Program { get; set; }
+        public ProgramBaseResponse Program { get; set; }
     }
 
     public class StudentCsvBaseResponse : PersonBaseResponse

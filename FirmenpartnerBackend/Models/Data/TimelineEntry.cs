@@ -2,7 +2,7 @@
 
 namespace FirmenpartnerBackend.Models.Data
 {
-    public class TimelineEntry : BaseModel
+    public class TimelineEntry : BaseModel, ISoftDeletable
     {
         [Required]
         [DataType(DataType.Date)]
@@ -17,5 +17,8 @@ namespace FirmenpartnerBackend.Models.Data
         public string? Link { get; set; }
 
         public string? LinkText { get; set; }
+
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedTimestamp { get; set; }
     }
 }

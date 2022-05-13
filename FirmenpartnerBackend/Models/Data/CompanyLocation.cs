@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FirmenpartnerBackend.Models.Data
 {
-    public class CompanyLocation : BaseModel
+    public class CompanyLocation : BaseModel, ISoftDeletable
     {
         [Required]
         public string Address { get; set; }
@@ -20,5 +20,7 @@ namespace FirmenpartnerBackend.Models.Data
         [Required]
         [ForeignKey(nameof(CompanyId))]
         public Company Company { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedTimestamp { get; set; }
     }
 }

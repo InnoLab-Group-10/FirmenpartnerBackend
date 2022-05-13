@@ -2,7 +2,7 @@
 
 namespace FirmenpartnerBackend.Models.Data
 {
-    public class Person : BaseModel
+    public class Person : BaseModel, ISoftDeletable
     {
         [Required]
         public string FirstName { get; set; }
@@ -21,5 +21,7 @@ namespace FirmenpartnerBackend.Models.Data
         public string? Phone { get; set; }
 
         public string? Notes { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedTimestamp { get; set; }
     }
 }

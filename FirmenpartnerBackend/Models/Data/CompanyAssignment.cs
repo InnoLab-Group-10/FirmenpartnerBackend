@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FirmenpartnerBackend.Models.Data
 {
-    public class CompanyAssignment : BaseModel
+    public class CompanyAssignment : BaseModel, ISoftDeletable
     {
         [Required]
         public Guid CompanyId { get; set; }
@@ -24,5 +24,7 @@ namespace FirmenpartnerBackend.Models.Data
 
         [DataType(DataType.Date)]
         public DateTime? To { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedTimestamp { get; set; }
     }
 }

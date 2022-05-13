@@ -2,7 +2,7 @@
 
 namespace FirmenpartnerBackend.Models.Data
 {
-    public class Company : BaseModel
+    public class Company : BaseModel, ISoftDeletable
     {
 
         [Required]
@@ -15,6 +15,7 @@ namespace FirmenpartnerBackend.Models.Data
         public int MaxStudents { get; set; }
 
         public string? Notes { get; set; }
-
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedTimestamp { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using FirmenpartnerBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FirmenpartnerBackend.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220513090737_Added columns for soft delete feature")]
+    partial class Addedcolumnsforsoftdeletefeature
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.3");
@@ -105,7 +107,7 @@ namespace FirmenpartnerBackend.Migrations
                     b.Property<bool>("ContractSigned")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("DeletedTimestamp")
+                    b.Property<DateTime>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -135,7 +137,7 @@ namespace FirmenpartnerBackend.Migrations
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("DeletedTimestamp")
+                    b.Property<DateTime>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("From")
@@ -176,7 +178,7 @@ namespace FirmenpartnerBackend.Migrations
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("DeletedTimestamp")
+                    b.Property<DateTime>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -199,7 +201,7 @@ namespace FirmenpartnerBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("DeletedTimestamp")
+                    b.Property<DateTime>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -256,7 +258,7 @@ namespace FirmenpartnerBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("DeletedTimestamp")
+                    b.Property<DateTime>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Discriminator")
@@ -302,7 +304,7 @@ namespace FirmenpartnerBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("DeletedTimestamp")
+                    b.Property<DateTime>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -357,7 +359,7 @@ namespace FirmenpartnerBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("DeletedTimestamp")
+                    b.Property<DateTime>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FirmenpartnerBackend.Models.Data
 {
-    public class FileEntry : BaseModel
+    public class FileEntry : BaseModel, ISoftDeletable
     {
         public string Name { get; set; }
 
@@ -19,5 +19,7 @@ namespace FirmenpartnerBackend.Models.Data
         [Required]
         [ForeignKey(nameof(OwnerId))]
         public ApplicationUser Owner { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedTimestamp { get; set; }
     }
 }
