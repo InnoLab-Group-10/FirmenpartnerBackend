@@ -27,17 +27,13 @@ namespace FirmenpartnerBackend.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [ProducesResponseType(404)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(200)]
         public virtual async Task<IActionResult> GetForUser([FromRoute] Guid id)
         {
             List<Notification> models = await GetDbSet().Where(n => n.RecipientId == id.ToString()).ToListAsync();
 
-            if (models.Count == 0) return NotFound(new NotificationMultiResponse()
-            {
-                Success = false,
-                Errors = new List<string>() { "No user with the given ID exists." }
-            }); ;
+            if (models.Count == 0) return NoContent();
 
             foreach (Notification model in models)
             {
