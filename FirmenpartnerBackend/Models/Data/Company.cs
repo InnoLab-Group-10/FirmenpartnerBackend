@@ -16,6 +16,6 @@ namespace FirmenpartnerBackend.Models.Data
 
         public string? Notes { get; set; }
         public bool IsDeleted { get; set; }
-        public DateTime? DeletedTimestamp { get; set; }
+        public DateTime DeletedTimestamp { get; set; }
     }
 }

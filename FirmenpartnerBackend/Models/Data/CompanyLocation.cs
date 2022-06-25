@@ -21,6 +21,6 @@ namespace FirmenpartnerBackend.Models.Data
         [ForeignKey(nameof(CompanyId))]
         public Company Company { get; set; }
         public bool IsDeleted { get; set; }
-        public DateTime? DeletedTimestamp { get; set; }
+        public DateTime DeletedTimestamp { get; set; }
     }
 }

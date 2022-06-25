@@ -25,6 +25,6 @@ namespace FirmenpartnerBackend.Models.Data
         [DataType(DataType.Date)]
         public DateTime? To { get; set; }
         public bool IsDeleted { get; set; }
-        public DateTime? DeletedTimestamp { get; set; }
+        public DateTime DeletedTimestamp { get; set; }
     }
 }
