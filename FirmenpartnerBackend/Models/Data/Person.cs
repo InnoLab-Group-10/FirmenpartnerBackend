@@ -21,6 +21,9 @@ namespace FirmenpartnerBackend.Models.Data
         public string? Phone { get; set; }
 
         public string? Notes { get; set; }
+
+        public ICollection<MailingList> MailingLists { get; set; }
+
         public bool IsDeleted { get; set; }
         public DateTime DeletedTimestamp { get; set; }
     }
