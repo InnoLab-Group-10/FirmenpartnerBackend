@@ -24,6 +24,10 @@ namespace FirmenpartnerBackend.Mapping
 
             CreateMap<TimelineEntryRequest, TimelineEntry>().ReverseMap();
 
+            CreateMap<MailingListRequest, MailingList>().ReverseMap();
+
+            CreateMap<MailingListEntryRequest, MailingListEntry>().ReverseMap();
+
             CreateMap<ProgramRequest, Models.Data.Program>().ReverseMap();
 
         }
