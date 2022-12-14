@@ -105,7 +105,7 @@ namespace FirmenpartnerBackend.Migrations
                     b.Property<bool>("ContractSigned")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("DeletedTimestamp")
+                    b.Property<DateTime?>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -135,7 +135,7 @@ namespace FirmenpartnerBackend.Migrations
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("DeletedTimestamp")
+                    b.Property<DateTime?>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("From")
@@ -176,7 +176,7 @@ namespace FirmenpartnerBackend.Migrations
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("DeletedTimestamp")
+                    b.Property<DateTime?>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -199,7 +199,7 @@ namespace FirmenpartnerBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("DeletedTimestamp")
+                    b.Property<DateTime?>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -224,27 +224,6 @@ namespace FirmenpartnerBackend.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("FileEntries");
-                });
-
-            modelBuilder.Entity("FirmenpartnerBackend.Models.Data.MailingList", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("DeletedTimestamp")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MailingLists");
                 });
 
             modelBuilder.Entity("FirmenpartnerBackend.Models.Data.Notification", b =>
@@ -277,7 +256,7 @@ namespace FirmenpartnerBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("DeletedTimestamp")
+                    b.Property<DateTime?>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Discriminator")
@@ -323,7 +302,7 @@ namespace FirmenpartnerBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("DeletedTimestamp")
+                    b.Property<DateTime?>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -378,7 +357,7 @@ namespace FirmenpartnerBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("DeletedTimestamp")
+                    b.Property<DateTime?>("DeletedTimestamp")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDeleted")
@@ -403,21 +382,6 @@ namespace FirmenpartnerBackend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TimelineEntries");
-                });
-
-            modelBuilder.Entity("MailingListPerson", b =>
-                {
-                    b.Property<Guid>("MailingListsId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("RecipientsId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("MailingListsId", "RecipientsId");
-
-                    b.HasIndex("RecipientsId");
-
-                    b.ToTable("MailingListEntries", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -639,21 +603,6 @@ namespace FirmenpartnerBackend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MailingListPerson", b =>
-                {
-                    b.HasOne("FirmenpartnerBackend.Models.Data.MailingList", null)
-                        .WithMany()
-                        .HasForeignKey("MailingListsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FirmenpartnerBackend.Models.Data.Person", null)
-                        .WithMany()
-                        .HasForeignKey("RecipientsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

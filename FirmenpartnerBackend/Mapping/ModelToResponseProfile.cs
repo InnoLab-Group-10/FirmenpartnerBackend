@@ -41,9 +41,6 @@ namespace FirmenpartnerBackend.Mapping
             CreateMap<FileEntry, FileSingleResponse>().ReverseMap();
 
             CreateMap<PersonBaseResponse, CompanyGetAllContactAssignmentBaseResponse>().ReverseMap();
-
-            CreateMap<MailingList, MailingListBaseResponse>().ReverseMap();
-            CreateMap<MailingList, MailingListSingleResponse>().ReverseMap();
         }
     }
 }

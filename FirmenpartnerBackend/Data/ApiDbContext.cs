@@ -17,7 +17,6 @@ namespace FirmenpartnerBackend.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<TimelineEntry> TimelineEntries { get; set; }
         public DbSet<FileEntry> FileEntries { get; set; }
-        public DbSet<MailingList> MailingLists { get; set; }
 
 
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)
@@ -34,11 +33,6 @@ namespace FirmenpartnerBackend.Data
             builder.Entity<CompanyAssignment>().HasQueryFilter(entity => !entity.IsDeleted);
             builder.Entity<TimelineEntry>().HasQueryFilter(entity => !entity.IsDeleted);
             builder.Entity<FileEntry>().HasQueryFilter(entity => !entity.IsDeleted);
-            builder.Entity<MailingList>()
-                .HasQueryFilter(entity => !entity.IsDeleted)
-                .HasMany(l => l.Recipients)
-                .WithMany(p => p.MailingLists)
-                .UsingEntity(x => x.ToTable("MailingListEntries"));
 
             base.OnModelCreating(builder);
         }
