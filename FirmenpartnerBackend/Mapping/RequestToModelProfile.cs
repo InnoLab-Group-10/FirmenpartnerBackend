@@ -30,6 +30,8 @@ namespace FirmenpartnerBackend.Mapping
 
             CreateMap<MailSettingRequest, MailSetting>().ReverseMap();
 
+            CreateMap<MailTemplateRequest, MailTemplate>().ReverseMap();
+
             CreateMap<ProgramRequest, Models.Data.Program>().ReverseMap();
 
         }

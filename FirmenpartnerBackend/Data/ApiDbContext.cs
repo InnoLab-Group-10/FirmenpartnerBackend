@@ -20,6 +20,7 @@ namespace FirmenpartnerBackend.Data
         public DbSet<MailingListEntry> MailingListsEntries { get; set; }
         public DbSet<MailingList> MailingLists { get; set; }
         public DbSet<MailSetting> MailSettings { get; set; }
+        public DbSet<MailTemplate> MailTemplates { get; set; }
 
 
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)
@@ -38,6 +39,7 @@ namespace FirmenpartnerBackend.Data
             builder.Entity<FileEntry>().HasQueryFilter(entity => !entity.IsDeleted);
             builder.Entity<MailingListEntry>().HasQueryFilter(entity => !entity.IsDeleted);
             builder.Entity<MailingList>().HasQueryFilter(entity => !entity.IsDeleted);
+            builder.Entity<MailTemplate>().HasQueryFilter(entity => !entity.IsDeleted);
 
             base.OnModelCreating(builder);
         }

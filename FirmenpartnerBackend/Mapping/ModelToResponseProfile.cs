@@ -47,6 +47,9 @@ namespace FirmenpartnerBackend.Mapping
 
             CreateMap<MailSetting, MailSettingSingleResponse>().ReverseMap();
 
+            CreateMap<MailTemplate, MailTemplateBaseResponse>().ReverseMap();
+            CreateMap<MailTemplate, MailTemplateSingleResponse>().ReverseMap();
+
             CreateMap<PersonBaseResponse, CompanyGetAllContactAssignmentBaseResponse>().ReverseMap();
         }
     }
