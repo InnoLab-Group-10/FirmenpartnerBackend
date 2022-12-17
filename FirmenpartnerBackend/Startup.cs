@@ -145,6 +145,7 @@ namespace FirmenpartnerBackend
 
             services.AddScoped<IAuthTokenService, AuthTokenService>();
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
+            services.AddScoped<IMailSettingsService, MailSettingsService>();
 
             // Configuration
 
@@ -191,8 +192,26 @@ namespace FirmenpartnerBackend
             });
 
             // Default root user and roles
+            await CreateDefaultMailSettings(serviceProvider);
             await CreateRoles(serviceProvider);
             await CreateRootUser(serviceProvider, Configuration.GetSection("RootUserConfig").Get<RootUserConfig>());
+        }
+
+        private async Task CreateDefaultMailSettings(IServiceProvider serviceProvider)
+        {
+            ApiDbContext dbContext = serviceProvider.GetRequiredService<ApiDbContext>();
+
+            foreach (var setting in MailSettings.DefaultMailSettings)
+            {
+                MailSetting? entry = await dbContext.MailSettings.FindAsync(setting.Id);
+
+                if (entry == null)
+                {
+                    dbContext.Add(setting);
+                }
+            }
+
+            dbContext.SaveChanges();
         }
 
         private async Task CreateRoles(IServiceProvider serviceProvider)

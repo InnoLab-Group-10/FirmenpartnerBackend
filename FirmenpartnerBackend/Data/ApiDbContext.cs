@@ -19,6 +19,7 @@ namespace FirmenpartnerBackend.Data
         public DbSet<FileEntry> FileEntries { get; set; }
         public DbSet<MailingListEntry> MailingListsEntries { get; set; }
         public DbSet<MailingList> MailingLists { get; set; }
+        public DbSet<MailSetting> MailSettings { get; set; }
 
 
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)

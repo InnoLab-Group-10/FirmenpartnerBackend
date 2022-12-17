@@ -28,6 +28,8 @@ namespace FirmenpartnerBackend.Mapping
 
             CreateMap<MailingListEntryRequest, MailingListEntry>().ReverseMap();
 
+            CreateMap<MailSettingRequest, MailSetting>().ReverseMap();
+
             CreateMap<ProgramRequest, Models.Data.Program>().ReverseMap();
 
         }
