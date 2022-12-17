@@ -50,6 +50,9 @@ namespace FirmenpartnerBackend.Mapping
             CreateMap<MailTemplate, MailTemplateBaseResponse>().ReverseMap();
             CreateMap<MailTemplate, MailTemplateSingleResponse>().ReverseMap();
 
+            CreateMap<SentMail, SendMailBaseResponse>().ReverseMap();
+            CreateMap<SentMail, SendMailSingleResponse>().ReverseMap();
+
             CreateMap<PersonBaseResponse, CompanyGetAllContactAssignmentBaseResponse>().ReverseMap();
         }
     }
