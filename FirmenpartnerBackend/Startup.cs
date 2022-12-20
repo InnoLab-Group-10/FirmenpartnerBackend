@@ -146,6 +146,7 @@ namespace FirmenpartnerBackend
             services.AddScoped<IAuthTokenService, AuthTokenService>();
             services.AddScoped<IResetPasswordService, ResetPasswordService>();
             services.AddScoped<IMailSettingsService, MailSettingsService>();
+            services.AddScoped<ITemplateMailService, TemplateMailService>();
 
             // Configuration
 
