@@ -2,7 +2,10 @@
 {
     public class MailingListEntryResponse
     {
-        public string Mail { get; set; }
-        public string? Note { get; set; }
+        public string? Prefix { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string? Suffix { get; set; }
+        public string Email { get; set; }
     }
 }

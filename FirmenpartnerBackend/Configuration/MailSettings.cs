@@ -24,13 +24,13 @@ namespace FirmenpartnerBackend.Configuration
             new() { Id = MailSettings.HEADER_BG_IMAGE, Value = "" },
 
             new() { Id = MailSettings.BODY_BG_COLOR, Value = "#ffffff" },
-            new() { Id = MailSettings.BODY_COLOR, Value = "#0000000" },
+            new() { Id = MailSettings.BODY_COLOR, Value = "#343a40" },
 
             new() { Id = MailSettings.FOOTER_BG_COLOR, Value = "#5c636a" },
             new() { Id = MailSettings.FOOTER_COLOR, Value = "#ffffff" },
             new() { Id = MailSettings.FOOTER_TEXT, Value = "" },
 
-            new() { Id = MailSettings.MAIL_BG_COLOR, Value = "#ffffff" },
+            new() { Id = MailSettings.MAIL_BG_COLOR, Value = "#e5e5e5" },
         };
     }
 }

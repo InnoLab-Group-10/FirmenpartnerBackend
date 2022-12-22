@@ -31,12 +31,62 @@ namespace FirmenpartnerBackend.Controllers
             this.mailService = mailService;
         }
 
+        [HttpGet]
+        [Route("preview/{templateId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> PreviewMailHtml([FromRoute] Guid templateId)
+        {
+            if (ModelState.IsValid)
+            {
+                MailTemplate? template = await dbContext.MailTemplates.FindAsync(templateId);
+                if (template == null)
+                {
+                    return NotFound(new SendMailSingleResponse()
+                    {
+                        Success = false,
+                        Errors = new List<string>() { "Invalid mail template ID." }
+                    });
+                }
+
+                List<(Guid guid, string name)> attachments = new();
+
+                try
+                {
+                    string body = mailService.GetMailHtml(template, attachments);
+                    return Ok(body);
+                }
+                catch (Exception e)
+                {
+                    return UnprocessableEntity(new SendMailSingleResponse()
+                    {
+                        Success = false,
+                        Errors = new List<string>() { $"Failed to preview E-mail: {e.Message}" }
+                    });
+                }
+            }
+            else
+            {
+                return BadRequest(new SendMailSingleResponse()
+                {
+                    Success = false,
+                    Errors = new List<string>() { "Invalid request." }
+                });
+            }
+        }
+
         [HttpPost]
         [Route("{list}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
         [ProducesResponseType(500)]
         [ProducesResponseType(200)]
         public async Task<IActionResult> SendToMailingList([FromBody] SendMailRequest request, [FromRoute] Guid list)
@@ -54,9 +104,11 @@ namespace FirmenpartnerBackend.Controllers
                     });
                 }
 
-                var adresses = mailingList.Entries.Select(x => new MailRecipient(x.Note, x.Mail));
-                var response = SendMails(request, adresses);
-                return Ok(response);
+                await dbContext.Entry(mailingList).Collection(e => e.Entries).LoadAsync();
+
+                var adresses = mailingList.Entries.Select(x => mapper.Map<MailRecipient>(x));
+                var response = await SendMails(request, adresses);
+                return response;
             }
             else
             {
@@ -74,6 +126,7 @@ namespace FirmenpartnerBackend.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
         [ProducesResponseType(500)]
         [ProducesResponseType(200)]
         public async Task<IActionResult> SendToAllCurrentContacts([FromBody] SendMailRequest request)
@@ -81,9 +134,9 @@ namespace FirmenpartnerBackend.Controllers
             if (ModelState.IsValid)
             {
                 IQueryable<Person> contacts = dbContext.CompanyAssignments.Where(a => a.To == null).Select(a => a.Person);
-                IEnumerable<MailRecipient> adresses = (await contacts.Where(p => p.Email != null).ToListAsync()).Select(p => new MailRecipient($"{p.Prefix} {p.FirstName} {p.LastName} {p.Suffix}", p.Email));
-                var response = SendMails(request, adresses);
-                return Ok(response);
+                IEnumerable<MailRecipient> adresses = (await contacts.Where(p => p.Email != null).ToListAsync()).Select(p => mapper.Map<MailRecipient>(p));
+                var response = await SendMails(request, adresses);
+                return response;
             }
             else
             {
@@ -101,6 +154,7 @@ namespace FirmenpartnerBackend.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
         [ProducesResponseType(500)]
         [ProducesResponseType(200)]
         public async Task<IActionResult> SendToAllCurrentContactsInActiveCompany([FromBody] SendMailRequest request)
@@ -108,9 +162,9 @@ namespace FirmenpartnerBackend.Controllers
             if (ModelState.IsValid)
             {
                 IQueryable<Person> contacts = dbContext.CompanyAssignments.Where(a => a.To == null && a.Company.ContractSigned).Select(a => a.Person);
-                IEnumerable<MailRecipient> adresses = (await contacts.Where(p => p.Email != null).ToListAsync()).Select(p => new MailRecipient($"{p.Prefix} {p.FirstName} {p.LastName} {p.Suffix}", p.Email));
-                var response = SendMails(request, adresses);
-                return Ok(response);
+                IEnumerable<MailRecipient> adresses = (await contacts.Where(p => p.Email != null).ToListAsync()).Select(p => mapper.Map<MailRecipient>(p));
+                var response = await SendMails(request, adresses);
+                return response;
             }
             else
             {
@@ -128,6 +182,7 @@ namespace FirmenpartnerBackend.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
+        [ProducesResponseType(422)]
         [ProducesResponseType(500)]
         [ProducesResponseType(200)]
         public async Task<IActionResult> SendToAllCurrentContactsInInactiveCompany([FromBody] SendMailRequest request)
@@ -135,9 +190,9 @@ namespace FirmenpartnerBackend.Controllers
             if (ModelState.IsValid)
             {
                 IQueryable<Person> contacts = dbContext.CompanyAssignments.Where(a => a.To == null && !a.Company.ContractSigned).Select(a => a.Person);
-                IEnumerable<MailRecipient> adresses = (await contacts.Where(p => p.Email != null).ToListAsync()).Select(p => new MailRecipient($"{p.Prefix} {p.FirstName} {p.LastName} {p.Suffix}", p.Email));
-                var response = SendMails(request, adresses);
-                return Ok(response);
+                IEnumerable<MailRecipient> adresses = (await contacts.Where(p => p.Email != null).ToListAsync()).Select(p => mapper.Map<MailRecipient>(p));
+                var response = await SendMails(request, adresses);
+                return response;
             }
             else
             {
@@ -161,7 +216,7 @@ namespace FirmenpartnerBackend.Controllers
                 });
             }
 
-            List<(string path, string name)> attachments = new();
+            List<(Guid guid, string name)> attachments = new();
             foreach (Guid guid in request.Attachments)
             {
                 FileEntry? model = await dbContext.FileEntries.FindAsync(guid);
@@ -179,7 +234,7 @@ namespace FirmenpartnerBackend.Controllers
                     string filePath = Path.Combine(fileUploadConfig.TargetPath, model.Id.ToString());
                     if (System.IO.File.Exists(filePath))
                     {
-                        attachments.Add((filePath, model.Name));
+                        attachments.Add((guid, model.Name));
                     }
                     else
                     {
@@ -194,7 +249,8 @@ namespace FirmenpartnerBackend.Controllers
 
             try
             {
-                mailService.SendMail(request.Subject, template, attachments, recipients);
+                string body = mailService.GetMailHtml(template, attachments);
+                mailService.SendMail(request.Subject, body, recipients);
             }
             catch (Exception e)
             {
@@ -205,7 +261,10 @@ namespace FirmenpartnerBackend.Controllers
                 });
             }
 
-            return null;
+            return Ok(new SendMailSingleResponse()
+            {
+                Success = true
+            });
         }
     }
 }

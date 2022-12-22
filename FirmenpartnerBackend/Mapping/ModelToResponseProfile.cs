@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FirmenpartnerBackend.Models.Data;
 using FirmenpartnerBackend.Models.Response;
+using FirmenpartnerBackend.Service;
 
 namespace FirmenpartnerBackend.Mapping
 {
@@ -51,6 +52,10 @@ namespace FirmenpartnerBackend.Mapping
             CreateMap<MailTemplate, MailTemplateSingleResponse>().ReverseMap();
 
             CreateMap<PersonBaseResponse, CompanyGetAllContactAssignmentBaseResponse>().ReverseMap();
+
+            // Technically not a response but whatever
+            CreateMap<MailingListEntry, MailRecipient>();
+            CreateMap<Person, MailRecipient>();
         }
     }
 }

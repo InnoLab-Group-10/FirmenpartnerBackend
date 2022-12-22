@@ -1,50 +1,80 @@
-﻿using FirmenpartnerBackend.Models.Data;
-using MimeKit;
-using NETCore.MailKit;
+﻿using FirmenpartnerBackend.Configuration;
+using FirmenpartnerBackend.Models.Data;
 using NETCore.MailKit.Core;
+using System.Text;
 
 namespace FirmenpartnerBackend.Service
 {
     public class TemplateMailService : ITemplateMailService
     {
-        private readonly IMailKitProvider mailKitProvider;
+        private readonly IEmailService emailService;
         private readonly IMailSettingsService mailSettingsService;
+        private readonly MailConfig mailConfig;
+        private readonly FileUploadConfig fileUploadConfig;
 
-        public TemplateMailService(IEmailService emailService, IMailSettingsService mailSettingsService, IMailKitProvider mailKitProvider)
+        public TemplateMailService(IMailSettingsService mailSettingsService, IEmailService emailService, MailConfig mailConfig, FileUploadConfig fileUploadConfig)
         {
             this.mailSettingsService = mailSettingsService;
-            this.mailKitProvider = mailKitProvider;
+            this.emailService = emailService;
+            this.mailConfig = mailConfig;
+            this.fileUploadConfig = fileUploadConfig;
         }
 
-        public void SendMail(string subject, MailTemplate template, IEnumerable<(string path, string name)> attachments, IEnumerable<MailRecipient> recipients)
+        public void SendMail(string subject, string body, IEnumerable<MailRecipient> recipients)
         {
-            MimeMessage message = new MimeMessage();
-
             foreach (MailRecipient recipient in recipients)
             {
-                message.Cc.Add(new MailboxAddress(recipient.Name, recipient.Address));
+                emailService.Send(recipient.Email, subject, body, true);
             }
+        }
 
-            message.Subject = subject;
+        public string GetMailHtml(MailTemplate template, IEnumerable<(Guid guid, string name)> attachments)
+        {
+            string baseHtml = File.ReadAllText(mailConfig.TemplatePath);
 
-            var builder = new BodyBuilder();
+            string headerBackgroundImageId = mailSettingsService.GetSetting(MailSettings.HEADER_BG_IMAGE).Result.Value;
+            string headerLogoImageId = mailSettingsService.GetSetting(MailSettings.HEADER_LOGO).Result.Value;
 
-            builder.HtmlBody = template.Content;
+            string? headerBackgroundImageUrl = headerBackgroundImageId == "" ? null : Path.Combine(fileUploadConfig.HostingPath, headerBackgroundImageId);
+            string? headerLogoImageUrl = headerLogoImageId == "" ? null : Path.Combine(fileUploadConfig.HostingPath, headerLogoImageId);
 
-            // TODO add header, footer, logo etc specified in mail settings
+            string headerBackgroundColor = mailSettingsService.GetSetting(MailSettings.HEADER_BG_COLOR).Result.Value;
+            string bodyBackgroundColor = mailSettingsService.GetSetting(MailSettings.BODY_BG_COLOR).Result.Value;
+            string bodyColor = mailSettingsService.GetSetting(MailSettings.BODY_COLOR).Result.Value;
+            string footerBackgroundColor = mailSettingsService.GetSetting(MailSettings.FOOTER_BG_COLOR).Result.Value;
+            string footerColor = mailSettingsService.GetSetting(MailSettings.FOOTER_COLOR).Result.Value;
+            string footerText = mailSettingsService.GetSetting(MailSettings.FOOTER_TEXT).Result.Value;
+            string mailBackgroundColor = mailSettingsService.GetSetting(MailSettings.MAIL_BG_COLOR).Result.Value;
 
-            foreach (var attachment in attachments)
+            string bodyText = template.Content;
+
+            StringBuilder attachmentListBuilder = new StringBuilder();
+            if (attachments.Count() > 0)
             {
-                byte[] bytes = File.ReadAllBytes(attachment.path);
-                builder.Attachments.Add(attachment.name, bytes);
+                attachmentListBuilder.Append("<ul>");
+                foreach (var attachment in attachments)
+                {
+                    string url = Path.Combine(fileUploadConfig.HostingPath, attachment.guid.ToString());
+                    attachmentListBuilder.Append($"<li><a href=\"{url}\">{attachment.name}</a></li>");
+                }
+                attachmentListBuilder.Append("</ul>");
             }
 
-            message.Body = builder.ToMessageBody();
-
-            using (var client = mailKitProvider.SmtpClient)
-            {
-                client.Send(message);
-            }
+            return baseHtml
+                .Replace("%MAIL_BG_COLOR%", mailBackgroundColor)
+                .Replace("%HEADER_BG_COLOR%", headerBackgroundColor)
+                .Replace("%HEADER_BG_IMAGE%", headerBackgroundImageUrl ?? "")
+                .Replace("%HEADER_BG_IMAGE_HIDDEN%", headerBackgroundImageUrl == null ? "hidden" : "")
+                .Replace("%BODY_BG_COLOR%", bodyBackgroundColor)
+                .Replace("%BODY_COLOR%", bodyColor)
+                .Replace("%FOOTER_BG_COLOR%", footerBackgroundColor)
+                .Replace("%FOOTER_COLOR%", footerColor)
+                .Replace("%HEADER_LOGO%", headerLogoImageUrl ?? "")
+                .Replace("%HEADER_LOGO_HIDDEN%", headerLogoImageUrl == null ? "hidden" : "")
+                .Replace("%BODY_TEXT%", bodyText)
+                .Replace("%ATTACHMENTS%", attachmentListBuilder.ToString())
+                .Replace("%ATTACHMENTS_HIDDEN%", attachments.Count() == 0 ? "hidden" : "")
+                .Replace("%FOOTER_TEXT%", footerText);
         }
     }
 }

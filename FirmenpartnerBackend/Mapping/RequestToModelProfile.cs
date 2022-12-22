@@ -33,7 +33,6 @@ namespace FirmenpartnerBackend.Mapping
             CreateMap<MailTemplateRequest, MailTemplate>().ReverseMap();
 
             CreateMap<ProgramRequest, Models.Data.Program>().ReverseMap();
-
         }
     }
 }

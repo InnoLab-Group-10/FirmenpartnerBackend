@@ -8,7 +8,6 @@ namespace FirmenpartnerBackend.Models.Request
         public Guid Template { get; set; }
         [Required]
         public string Subject { get; set; }
-        [Required]
         public List<Guid> Attachments { get; set; }
     }
 }

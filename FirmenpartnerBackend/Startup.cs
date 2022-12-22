@@ -127,6 +127,8 @@ namespace FirmenpartnerBackend
             IConfiguration mailConfigSection = Configuration.GetSection("EMailConfig");
             MailConfig mailConfig = mailConfigSection.Get<MailConfig>();
 
+            services.AddSingleton<MailConfig>(mailConfig);
+
             services.AddMailKit(optionBuilder =>
             {
                 optionBuilder.UseMailKit(new MailKitOptions()
