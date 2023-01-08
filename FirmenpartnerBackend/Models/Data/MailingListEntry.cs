@@ -10,6 +10,7 @@ namespace FirmenpartnerBackend.Models.Data
         [Required]
         public string LastName { get; set; }
         public string? Suffix { get; set; }
+        public string? Company { get; set; }
         [Required]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }

@@ -25,6 +25,61 @@ namespace FirmenpartnerBackend.Controllers
         {
         }
 
+        [HttpPut]
+        [Route("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200)]
+        public override async Task<IActionResult> Put([FromBody] MailingListRequest request, [FromRoute] Guid id)
+        {
+            if (ModelState.IsValid)
+            {
+                MailingList? trackedModel = await GetDbSet().FindAsync(id);
+
+                if (trackedModel == null)
+                {
+                    return NotFound(new MailingListSingleResponse()
+                    {
+                        Success = false,
+                        Errors = new List<string>() { "No entity with the given ID exists." }
+                    });
+                }
+                else
+                {
+                    MailingList modifiedModel = mapper.Map<MailingList>(request);
+                    modifiedModel.Id = id;
+
+                    // Clear list of existing entries first...
+                    dbContext.Entry(trackedModel).Collection(m => m.Entries).Load();
+                    dbContext.MailingListsEntries.RemoveRange(trackedModel.Entries);
+
+                    // ...then set the new values - not super efficient, but I couldn't get it to work any other way
+                    foreach (MailingListEntry entry in modifiedModel.Entries)
+                    {
+                        entry.Id = Guid.NewGuid();
+                        dbContext.MailingListsEntries.Add(entry);
+                    }
+
+                    dbContext.Entry(trackedModel).CurrentValues.SetValues(modifiedModel);
+                    trackedModel.Entries = modifiedModel.Entries;
+
+                    await dbContext.SaveChangesAsync();
+
+                    MailingListSingleResponse response = mapper.Map<MailingListSingleResponse>(modifiedModel);
+                    response.Success = true;
+
+                    return Ok(response);
+                }
+            }
+
+            return BadRequest(new MailingListSingleResponse()
+            {
+                Success = false,
+                Errors = new List<string>() { "Invalid request." }
+            });
+        }
+
         [HttpGet]
         [Route("csv/{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
