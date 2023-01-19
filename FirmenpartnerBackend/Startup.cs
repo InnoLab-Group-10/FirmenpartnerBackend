@@ -26,10 +26,7 @@ namespace FirmenpartnerBackend
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApiDbContext>(options =>
-                options.UseSqlite(
-                    Configuration.GetConnectionString("SqliteDebug")
-                ));
+            services.AddDbContext<ApiDbContext>(ServiceLifetime.Singleton);
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -172,12 +169,14 @@ namespace FirmenpartnerBackend
 
         public async void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
-            //if (env.IsDevelopment())
-            //{
-            app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FirmenpartnerDB v1"));
-            //}
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FirmenpartnerDB v1"));
+            }
 
             app.UseHttpsRedirection();
 
@@ -194,10 +193,15 @@ namespace FirmenpartnerBackend
                 endpoints.MapControllers();
             });
 
+            app.ApplicationServices.GetRequiredService<ApiDbContext>().Database.Migrate();
+
             // Default root user and roles
-            await CreateDefaultMailSettings(serviceProvider);
-            await CreateRoles(serviceProvider);
-            await CreateRootUser(serviceProvider, Configuration.GetSection("RootUserConfig").Get<RootUserConfig>());
+            using (var scope = serviceProvider.CreateScope())
+            {
+                await CreateDefaultMailSettings(scope.ServiceProvider);
+                await CreateRoles(scope.ServiceProvider);
+                await CreateRootUser(scope.ServiceProvider, Configuration.GetSection("RootUserConfig").Get<RootUserConfig>());
+            }
         }
 
         private async Task CreateDefaultMailSettings(IServiceProvider serviceProvider)

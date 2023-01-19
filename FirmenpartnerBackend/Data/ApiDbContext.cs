@@ -22,10 +22,17 @@ namespace FirmenpartnerBackend.Data
         public DbSet<MailSetting> MailSettings { get; set; }
         public DbSet<MailTemplate> MailTemplates { get; set; }
 
+        private readonly IConfiguration configuration;
 
-        public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)
+
+        public ApiDbContext(DbContextOptions<ApiDbContext> options, IConfiguration configuration) : base(options)
         {
+            this.configuration = configuration;
+        }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
+        {
+            options.UseNpgsql(configuration.GetConnectionString("PostgreSQL"));
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
