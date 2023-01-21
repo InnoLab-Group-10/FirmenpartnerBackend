@@ -51,6 +51,9 @@ namespace FirmenpartnerBackend.Mapping
             CreateMap<MailTemplate, MailTemplateBaseResponse>().ReverseMap();
             CreateMap<MailTemplate, MailTemplateSingleResponse>().ReverseMap();
 
+            CreateMap<StudentCount, StudentCountBaseResponse>().ReverseMap();
+            CreateMap<StudentCount, StudentCountSingleResponse>().ReverseMap();
+
             CreateMap<PersonBaseResponse, CompanyGetAllContactAssignmentBaseResponse>().ReverseMap();
 
             // Technically not a response but whatever

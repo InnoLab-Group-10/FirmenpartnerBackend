@@ -21,6 +21,7 @@ namespace FirmenpartnerBackend.Data
         public DbSet<MailingList> MailingLists { get; set; }
         public DbSet<MailSetting> MailSettings { get; set; }
         public DbSet<MailTemplate> MailTemplates { get; set; }
+        public DbSet<StudentCount> StudentCounts { get; set; }
 
         private readonly IConfiguration configuration;
 
@@ -47,6 +48,7 @@ namespace FirmenpartnerBackend.Data
             builder.Entity<MailingListEntry>().HasQueryFilter(entity => !entity.IsDeleted);
             builder.Entity<MailingList>().HasQueryFilter(entity => !entity.IsDeleted);
             builder.Entity<MailTemplate>().HasQueryFilter(entity => !entity.IsDeleted);
+            builder.Entity<StudentCount>().HasQueryFilter(entity => !entity.IsDeleted);
 
             base.OnModelCreating(builder);
         }
