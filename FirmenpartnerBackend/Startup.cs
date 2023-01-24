@@ -26,7 +26,7 @@ namespace FirmenpartnerBackend
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApiDbContext>(ServiceLifetime.Singleton);
+            services.AddDbContext<ApiDbContext>(ServiceLifetime.Scoped);
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -193,11 +193,11 @@ namespace FirmenpartnerBackend
                 endpoints.MapControllers();
             });
 
-            app.ApplicationServices.GetRequiredService<ApiDbContext>().Database.Migrate();
-
             // Default root user and roles
             using (var scope = serviceProvider.CreateScope())
             {
+                scope.ServiceProvider.GetRequiredService<ApiDbContext>().Database.Migrate();
+
                 await CreateDefaultMailSettings(scope.ServiceProvider);
                 await CreateRoles(scope.ServiceProvider);
                 await CreateRootUser(scope.ServiceProvider, Configuration.GetSection("RootUserConfig").Get<RootUserConfig>());

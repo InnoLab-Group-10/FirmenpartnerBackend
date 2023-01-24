@@ -34,13 +34,6 @@ namespace FirmenpartnerBackend.Controllers
         [ProducesResponseType(typeof(GetAllUsersResponse), 200)]
         public async Task<IActionResult> GetAllUsers()
         {
-            //List<string> users = userManager.Users.Select(u => u.Id).ToList();
-            //return Ok(new GetAllUsersResponse()
-            //{
-            //    Success = true,
-            //    Users = users
-            //});
-
             List<UserBaseResponse> users = userManager.Users.Select(user => new UserBaseResponse()
             {
                 Id = new Guid(user.Id),
@@ -51,9 +44,14 @@ namespace FirmenpartnerBackend.Controllers
                 Suffix = user.Suffix,
                 Email = user.Email,
                 Phone = user.PhoneNumber,
-                Notes = user.Notes,
-                Roles = userManager.GetRolesAsync(user).Result.ToList()
+                Notes = user.Notes
             }).ToList();
+
+            foreach (UserBaseResponse response in users)
+            {
+                ApplicationUser user = await userManager.FindByIdAsync(response.Id.ToString());
+                response.Roles = new List<string>(await userManager.GetRolesAsync(user));
+            }
 
             return Ok(new UserMultiResponse()
             {
@@ -85,20 +83,6 @@ namespace FirmenpartnerBackend.Controllers
                 else
                 {
                     List<string> roles = (await userManager.GetRolesAsync(user)).ToList();
-
-                    //return Ok(new GetUserResponse()
-                    //{
-                    //    Success = true,
-                    //    Id = user.Id,
-                    //    Username = user.UserName,
-                    //    Prefix = user.Prefix,
-                    //    FirstName = user.FirstName,
-                    //    LastName = user.LastName,
-                    //    Suffix = user.Suffix,
-                    //    Email = user.Email,
-                    //    Phone = user.PhoneNumber,
-                    //    Roles = roles
-                    //});
 
                     return Ok(new UserSingleResponse()
                     {
