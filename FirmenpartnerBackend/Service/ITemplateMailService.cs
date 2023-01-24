@@ -1,10 +1,8 @@
-﻿using FirmenpartnerBackend.Models.Data;
-
-namespace FirmenpartnerBackend.Service
+﻿namespace FirmenpartnerBackend.Service
 {
     public interface ITemplateMailService
     {
-        string GetMailHtml(MailTemplate template, IEnumerable<(Guid guid, string name)> attachments);
+        string GetMailHtml(string body, IEnumerable<(Guid guid, string name)> attachments);
         void SendMail(string subject, string body, IEnumerable<MailRecipient> recipients);
     }
 

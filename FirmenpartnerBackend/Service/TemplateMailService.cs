@@ -1,5 +1,4 @@
 ﻿using FirmenpartnerBackend.Configuration;
-using FirmenpartnerBackend.Models.Data;
 using NETCore.MailKit.Core;
 using System.Text;
 
@@ -28,7 +27,7 @@ namespace FirmenpartnerBackend.Service
             }
         }
 
-        public string GetMailHtml(MailTemplate template, IEnumerable<(Guid guid, string name)> attachments)
+        public string GetMailHtml(string body, IEnumerable<(Guid guid, string name)> attachments)
         {
             string baseHtml = File.ReadAllText(mailConfig.TemplatePath);
 
@@ -46,7 +45,7 @@ namespace FirmenpartnerBackend.Service
             string footerText = mailSettingsService.GetSetting(MailSettings.FOOTER_TEXT).Result.Value;
             string mailBackgroundColor = mailSettingsService.GetSetting(MailSettings.MAIL_BG_COLOR).Result.Value;
 
-            string bodyText = template.Content;
+            string bodyText = body;
 
             StringBuilder attachmentListBuilder = new StringBuilder();
             if (attachments.Count() > 0)
