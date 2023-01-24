@@ -45,10 +45,13 @@ namespace FirmenpartnerBackend.Controllers
                 .GroupBy(c => c.Assignment.CompanyId)
                 .ToDictionary(x => x.Key);
 
+            Dictionary<Guid, IGrouping<Guid, StudentCount>>? fullHistory = dbContext.StudentCounts.OrderBy(c => c.Year).AsEnumerable().GroupBy(c => c.CompanyId).ToDictionary(x => x.Key);
+
             foreach (Company company in companies)
             {
                 List<CompanyGetAllLocationBaseResponse>? locationResponses = null;
                 List<CompanyGetAllContactAssignmentBaseResponse>? contactResponses = null;
+                List<StudentCountBaseResponse>? historyResponses = null;
 
                 IGrouping<Guid, CompanyLocation> locGroups;
                 if (locations.TryGetValue(company.Id, out locGroups))
@@ -69,11 +72,18 @@ namespace FirmenpartnerBackend.Controllers
                     }).ToList();
                 }
 
+                IGrouping<Guid, StudentCount> histGroups;
+                if (fullHistory.TryGetValue(company.Id, out histGroups))
+                {
+                    historyResponses = histGroups.Select(h => mapper.Map<StudentCountBaseResponse>(h)).ToList();
+                }
+
                 responses.Add(new FullCompanyInfoResponseEntry()
                 {
                     Company = mapper.Map<CompanyBaseResponse>(company),
                     Locations = locationResponses == null ? new List<CompanyGetAllLocationBaseResponse>() : locationResponses,
-                    Contacts = contactResponses == null ? new List<CompanyGetAllContactAssignmentBaseResponse>() : contactResponses
+                    Contacts = contactResponses == null ? new List<CompanyGetAllContactAssignmentBaseResponse>() : contactResponses,
+                    StudentCountHistory = historyResponses == null ? new List<StudentCountBaseResponse>() : historyResponses
                 });
             }
 

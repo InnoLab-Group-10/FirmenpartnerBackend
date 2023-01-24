@@ -12,6 +12,7 @@
         public CompanyBaseResponse Company { get; set; }
         public List<CompanyGetAllLocationBaseResponse> Locations { get; set; }
         public List<CompanyGetAllContactAssignmentBaseResponse> Contacts { get; set; }
+        public List<StudentCountBaseResponse> StudentCountHistory { get; set; }
     }
 
     public class CompanyGetAllLocationBaseResponse : ISingleResponse
